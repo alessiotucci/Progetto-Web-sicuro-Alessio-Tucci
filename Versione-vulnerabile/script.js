@@ -64,6 +64,22 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`Errore Login: ${result.message || result.error}`);
         }
     });
+
+	// 2. Configurazione Sign Up con Auto-Login
+	registerFormHandler('form-signup', '/api/signup', (result) => {
+    if (result.success)
+		{
+        alert(`Registrazione completata! Benvenuto ${result.user.username}.`);
+        // Esegue l'auto-login salvando i dati ricevuti dal backend
+        localStorage.setItem('user', JSON.stringify(result.user));
+        updateNavbar();
+        my_navigateTo('/dashboard');
+    }
+	else
+	{
+        alert(`Errore Registrazione: ${result.message || result.error}`);
+    }
+	});
 });
 
 // Gestione dei click sui link della navbar in script.js

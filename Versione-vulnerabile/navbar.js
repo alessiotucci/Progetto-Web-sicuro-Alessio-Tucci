@@ -6,6 +6,7 @@ export function updateNavbar()
     const profileLink = document.getElementById('nav-profile');
     const adminLink = document.getElementById('nav-admin');
 
+
     if (userJson)
 	{
         // UTENTE LOGGATO

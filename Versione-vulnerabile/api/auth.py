@@ -46,3 +46,41 @@ def login():
         }), 200
     else:
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
+
+
+@auth_bp.route('/api/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({"success": False, "message": "Campi mancanti"}), 400
+    
+    username = data['username']
+    password = data['password']
+
+    conn = sqlite3.connect('laundry.db')
+    cursor = conn.cursor()
+
+    # =========================================================================
+    # VULNERABILITÀ: SQL INJECTION (Mantenuta tramite f-string)
+    # Iniettando apici nel form di registrazione è possibile rompere la query
+    # o tentare attacchi di SQL Injection di tipo "Second-Order".
+    # =========================================================================
+    query = f"INSERT INTO users (username, password, role) VALUES ('{username}', '{password}', 'user')"
+    
+    try:
+        cursor.execute(query)
+        conn.commit() # Salva le modifiche nel database
+    except sqlite3.Error as e:
+        conn.close()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+    conn.close()
+    # Restituisce direttamente i dati utente per l'auto-login nel front-end
+    return jsonify({
+        "success": True,
+        "user": {
+            "id": user_id,
+            "username": username,
+            "role": "user"
+        }
+    }), 201
