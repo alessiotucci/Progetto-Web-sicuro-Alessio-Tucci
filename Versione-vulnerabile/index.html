@@ -3,9 +3,10 @@
  <html lang="ENG">
 	<head>
 		<meta charset="UTF-8">
+		<link rel="icon" href="/shared/basic-icon512.png" type="image/png">
 		<title>Vulnerable Version</title>
 		<link rel="stylesheet" href="styles.css">
-		<script src="script.js">
+		<script type="module" src="script.js">
 		</script>
 	</head>
 	<body>
@@ -14,10 +15,10 @@
 		<header>
 			<nav>
 				<a href="/" class="nav-link">Home</a>
-				<a href="/login" class="nav-link">Login</a>
-				<a href="/signup" class="nav-link">Sign Up</a>
-				<a href="/dashboard" class="nav-link">Dashborad</a>
-				<a href="/admin" class="nav-link">Admin</a>
+				<a href="/login" class="nav-link" id="nav-auth">Login</a>
+				<a href="/signup" class="nav-link" id="nav-profile">Sign Up</a>
+				<a href="/dashboard" class="nav-link">Dashboard</a>
+				<a href="/admin" class="nav-link" id="nav-admin" style="display: none;">Admin</a>
 			</nav>
 		</header>
 
@@ -100,7 +101,7 @@
 		</main>
 
 		<footer>
-			This is a small project crated by <a href="https://alessiotucci.com">Alessio Tucci</a>
+			This is a small project created by <a href="https://alessiotucci.com">Alessio Tucci</a>
 			as part of the course <a href="https://www.didattica-cps.unito.it/do/corsi.pl/Show?_id=aj9k">
 			Web sicuro e Personalizzato</a>
 		</footer>
