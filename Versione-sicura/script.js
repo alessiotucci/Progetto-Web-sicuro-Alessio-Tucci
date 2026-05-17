@@ -1,0 +1,1 @@
+console.log("Script for the secure version!");

@@ -1,1 +1,85 @@
 /* Custom CSS for the vulnerable version */
+body
+{
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+nav
+{
+    margin-bottom: 20px;
+}
+
+nav a
+{
+    margin-right: 15px;
+    text-decoration: none;
+    color: blue;
+}
+
+/* Hide and Show the current view  */
+.view
+{
+    display: none;
+}
+
+.view.active
+{
+    display: block;
+}
+/* Contenitore principale delle card */
+.cards-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* Struttura della singola card */
+.card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    width: 220px; /* Dimensione fissa della card */
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Regola per il controllo delle immagini */
+.card img {
+    width: 100%;          /* Occupa tutta la larghezza interna della card */
+    height: 150px;        /* Blocca l'altezza uguale per tutte le macchine */
+    object-fit: cover;    /* Ritaglia l'immagine proporzionalmente senza distorcerla */
+    border-radius: 6px;   /* Arrotonda gli angoli della foto */
+    margin-bottom: 12px;
+}
+
+/* Spaziatura elementi interni */
+.card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+}
+
+.status {
+    margin: 10px 0;
+    font-size: 0.9rem;
+}
+
+.btn-book {
+    width: 100%;
+    padding: 8px;
+    background: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-book:hover {
+    background: #0056b3;
+}

@@ -5,8 +5,106 @@
 		<meta charset="UTF-8">
 		<title>Vulnerable Version</title>
 		<link rel="stylesheet" href="styles.css">
+		<script src="script.js">
+		</script>
 	</head>
 	<body>
 
+		<!-- cute header to navigate the page! s-->
+		<header>
+			<nav>
+				<a href="/" class="nav-link">Home</a>
+				<a href="/login" class="nav-link">Login</a>
+				<a href="/signup" class="nav-link">Sign Up</a>
+				<a href="/dashboard" class="nav-link">Dashborad</a>
+				<a href="/admin" class="nav-link">Admin</a>
+			</nav>
+		</header>
+
+		<!-- Careful, you rename it with my_app!-->
+		<main id="my_app">
+
+		<!--1) Home -->
+		<div id="view-home" class="view active">
+			<h1> Welcome to the washing machine pages</h1>
+			<p> To start, create an account or log in!</p>
+		</div>
+		
+		<!--2) Login -->
+		<div id="view-login" class="view">
+			<h2>Log in!</h2>
+			<form id="form-login">
+				<input type="text" name="username" placeholder="Username" required><br><br>
+                <input type="password" name="password" placeholder="Password" required><br><br>
+                <button type="submit">Log in</button>
+			</form>
+			
+		</div>
+		
+		<!--3) Signup -->
+		<div id="view-signup" class="view">
+			<h2>Sign up!</h2>
+			<form id="form-signup">
+				<input type="text" name="username" placeholder="Username" required> <br><br>
+				<input type="password" name="password" placeholder="Password" required> <br><br>
+				<button type="submit">Sign up</button>
+			</form>
+
+		</div>
+
+		<!-- Vista 4: Dashboard User -->
+		<div id="view-dashboard" class="view">
+		    <h2>Current Status</h2>
+		    <div class="cards-container">
+		        <!-- Card  1 -->
+		        <div class="card" id="mach-l1">
+		            <h3>Lavatrice 1</h3>
+					<img src="../shared/lavatrice-1.jpg">
+		            <p class="status">Status: <span class="status-text">Loading...</span></p>
+		            <button class="btn-book" onclick="my_booking('l1')">book</button>
+		        </div>
+		        <!-- Card  2 -->
+		        <div class="card" id="mach-l2">
+		            <h3>Lavatrice 2</h3>
+					<img src="../shared/lavatrice-2.jpg">
+		            <p class="status">Status: <span class="status-text">Loading...</span></p>
+		            <button class="btn-book" onclick="my_booking('l2')">book</button>
+		        </div>
+		        <!-- Card Dryier -->
+		        <div class="card" id="mach-a1">
+		            <h3>Asciugatrice 1</h3>
+					<img src="../shared/asciugatrice.jpg">
+		            <p class="status">Status: <span class="status-text">Loading...</span></p>
+		            <button class="btn-book" onclick="my_booking('a1')">book</button>
+		        </div>
+		    </div>
+		
+			<!-- TODO: do it later on-->
+		    <!-- Sezione Note Pubbliche (Vettore Stored XSS obbligatorio per l'esame) -->
+		    <div class="feedback-section">
+		        <h3>Bacheca Segnalazioni Guasti / Note</h3>
+		        <form id="form-segnalazione">
+		            <textarea id="testo-segnalazione" placeholder="Es: La lavatrice 1 perde acqua..." required></textarea><br>
+		            <button type="submit">Invia Segnalazione</button>
+		        </form>
+		        <div id="segnalazioni-container"></div>
+		    </div>
+		</div>
+
+		<!--5) Admin -->
+		<div id="view-admin" class="view">
+			<h2> Admin panel - check who is using the washing machine</h2>
+			<p>If you are able to see this page without the credentials, this web-page is unsafe</p>
+		</div>
+
+		</main>
+
+		<footer>
+			This is a small project crated by <a href="https://alessiotucci.com">Alessio Tucci</a>
+			as part of the course <a href="https://www.didattica-cps.unito.it/do/corsi.pl/Show?_id=aj9k">
+			Web sicuro e Personalizzato</a>
+		</footer>
 	</body>
  </html>
+
+ <!-- SINGLE PAGE APPLICATION -->
