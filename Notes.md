@@ -42,3 +42,7 @@ TODO:
 
 * creazione della rotta profilo: es. mostrare le prenotazioni recenti
 * per il profilo admin: mostrare tutte le prenotazioni
+
+---
+* 6 June 2026
+
