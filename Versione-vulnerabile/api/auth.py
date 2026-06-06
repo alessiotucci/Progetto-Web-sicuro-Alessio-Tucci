@@ -69,6 +69,7 @@ def signup():
     
     try:
         cursor.execute(query)
+        user_id = cursor.lastrowid # Gemini mi salva?
         conn.commit() # Salva le modifiche nel database
     except sqlite3.Error as e:
         conn.close()
