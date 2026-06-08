@@ -1,17 +1,18 @@
 from flask import Blueprint, request, jsonify
-from db import get_db
+from api.db import get_db
 
 notes_bp = Blueprint('notes', __name__)
 
 # 1) Read all - GET /api/notes
-#@notes_bp.route()
+@notes_bp.route('/', methods=['GET'])
 def get_notes():
     db = get_db()
     #TODO: no auth service, no check admin role, not cleaning input
     notes = db.execute("""
-    SELECT
-    FROM
-    JOIN
+    SELECT n.id, n.content, n.created_at, u.username, m.name
+    FROM notes n
+    JOIN users u ON n.user_id = u.id
+    JOIN machines m ON n.machine_id = m.id
     """).fetchall()
 
     return jsonify([dict(row) for row in notes]), 200
@@ -22,10 +23,11 @@ def get_note(note_id):
     db = get_db()
     #TODO: no auth service, no check admin role, not cleaning input
     note = db.execute("""
-    SELECT
-    FROM
-    JOIN
-    WHERE
+    SELECT n.id, n.content, n.created_at, u.username, m.name
+    FROM notes n
+    JOIN users u ON n.user_id = u.id
+    JOIN machines m ON n.machine_id = m.id
+    WHERE n.id = '%s'
     """ % note_id).fetchone()
 
     if note is None:
@@ -47,8 +49,8 @@ def create_note():
     #created_at ???
 
     db.execute(
-            "INSERT INTO notes (id, user_id, machine_id, content) VALUE (?, ?,
-            ?, ?)", (note_id, user_id, machine_id, content)
+            "INSERT INTO notes (id, user_id, machine_id, content) VALUE (?, ?, ?, ?)"
+            , (note_id, user_id, machine_id, content)
             )
     db.commit()
 

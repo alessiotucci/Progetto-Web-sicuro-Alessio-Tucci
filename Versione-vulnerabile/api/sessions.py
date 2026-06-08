@@ -1,11 +1,11 @@
 from flask import Blueprint, request, jsonify
-from db import get_db
+from api.db import get_db
 
 sessions_bp = Blueprint('sessions', __name__)
 
 
 # 1) Read all - GET /api/sessions
-# @sessions_bp.rout()
+@sessions_bp.route('/', methods=['GET'])
 def get_sessions():
     db = get_db()
     #TODO: no auth service, no check admin role, not cleaning input
@@ -19,7 +19,7 @@ def get_sessions():
     return jsonify([dict(row) for row in sessions]), 200
 
 # 2) Read one - GET /api/sessions/<session_id>
-@session_bp.route('/<session_id>', methods=['GET'])
+@sessions_bp.route('/<session_id>', methods=['GET'])
 def get_session(session_id):
     db = get_db()
     #TODO: no auth service, no check admin role, no cleaing input
@@ -38,8 +38,8 @@ def get_session(session_id):
 
 
 # 3) Create - POST /api/sessions
-@session_bp.route('/', methods=['POST'])
-def create_session()
+@sessions_bp.route('/', methods=['POST'])
+def create_session():
     db = get_db()
     data = request.get_json()
 
@@ -51,13 +51,13 @@ def create_session()
     #WHERE IS THE SESSION ID, CMON BRO???
 
     db.execute(
-            "INSERT INTO sessions (user_id, machine_id, started_at, ended_at)
-            VALUE (?, ?, ?, ?)", (user_id, machine_id, started_at, ended_at)
-            db.commit()
+            "INSERT INTO sessions (user_id, machine_id, started_at, ended_at) VALUE (?, ?, ?, ?)"
+            , (user_id, machine_id, started_at, ended_at))
+    db.commit()
 
-            return jsonify({'message': 'Session creatd', 'id': session_id}), 201
+    return jsonify({'message': 'Session creatd'}), 201
 # 4) Update - PUT /api/sessions/<session_id>
-@session_bp.route('/<session_id>', methods=["PUT"])
+@sessions_bp.route('/<session_id>', methods=["PUT"])
 def update_session(session_id):
     db = get_db()
     data = request.get_json()
@@ -76,12 +76,12 @@ def update_session(session_id):
 
 
 # 5) Delete - DELETE /api/sessions/<session_id>
-@session_bp.route('/<session_id>', methods=["DELETE"])
+@sessions_bp.route('/<session_id>', methods=["DELETE"])
 def delete_session(session_id):
     db = get_db()
 
     #TODO: no auth service, no check admin role, no cleaning input
-    db.execute("DELETE FROM session WHERE id = ?", (session_id,))
+    db.execute("DELETE FROM sessions WHERE id = ?", (session_id,))
     db.commit()
 
     return jsonify({'message': 'Session deleted'}), 200

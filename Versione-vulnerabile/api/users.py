@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
-from db import get_db
+from api.db import get_db
 
-user_bp = Blueprint('users', __name__)
-
+users_bp = Blueprint('users', __name__)
 
 # 1) Read all - GET /api/users
+@users_bp.route('/', methods=['GET'])
 def get_users():
     db = get_db()
     #TODO: no auth service, no check admin role, not cleaning input
@@ -16,9 +16,9 @@ def get_users():
     return jsonify([dict(row) for row in users]), 200
 
 # 2) Read one - GET /api/users/<user_id>
-@users_pb.route('/<user_id>', methods=['GET'])
+@users_bp.route('/<user_id>', methods=['GET'])
 def get_user(user_id):
-    db - get_db()
+    db = get_db()
     user = db.execute("""
     SELECT u.username, u.role
     FROM users u
@@ -47,7 +47,7 @@ def create_user():
             )
     db.commit()
 
-    return jsonify({'message': 'User created', 'id': user_id}), 201
+    return jsonify({'message': 'User created'}), 201
 
 # 4) Update - PUT /api/users/<user_id>
 @users_bp.route('/<user_id>', methods=['PUT'])

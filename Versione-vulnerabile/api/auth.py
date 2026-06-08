@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from api.db import get_db
 import sqlite3
 
 auth_bp = Blueprint('auth', __name__)

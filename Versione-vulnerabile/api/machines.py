@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
-from db import get_db
+from api.db import get_db
 
 # Every file defines one Blueprint, named after the resources
-machine_bp = Blueprint('machines', __name__)
+machines_bp = Blueprint('machines', __name__)
 
 # 1) Read all - GET /api/machines
+@machines_bp.route('/', methods=['GET'])
 def get_machines():
     db = get_db()
     #TODO: no auth service, no check admin role, not cleaning input
