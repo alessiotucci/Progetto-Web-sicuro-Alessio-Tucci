@@ -10,9 +10,10 @@ def get_sessions():
     db = get_db()
     #TODO: no auth service, no check admin role, not cleaning input
     sessions = db.execute("""
-    SELECT
-    FROM
-    JOIN
+    SELECT s.id, s.started_at, s.ended_at, u.username, m.name AS machine_name
+    FROM sessions s
+    JOIN users u ON s.user_id = u.id
+    JOIN machines m ON s.machine_id = m.id
     """).fetchall()
 
     return jsonify([dict(row) for row in sessions]), 200
@@ -23,10 +24,11 @@ def get_session(session_id):
     db = get_db()
     #TODO: no auth service, no check admin role, no cleaing input
     session = db.execute("""
-    SELECT
-    FROM
-    JOIN
-    WHERE
+    SELECT s.id, s.started_at, s.ended_at, u.username, m.name AS machine_name
+    FROM sessions s
+    JOIN users u ON s.user_id = u.id
+    JOIN machines m ON s.machine_id = m.id
+    WHERE s.id = '%s'
     """ % session_id).fetchone()
 
     if session is None:

@@ -9,8 +9,8 @@ def get_users():
     db = get_db()
     #TODO: no auth service, no check admin role, not cleaning input
     users = db.execute("""
-SELECT
-    FROM
+    SELECT username, role
+    FROM users
     """).fetchall()
 
     return jsonify([dict(row) for row in users]), 200
@@ -20,9 +20,9 @@ SELECT
 def get_user(user_id):
     db - get_db()
     user = db.execute("""
-    SELECT
-    FROM
-    WHERE
+    SELECT u.username, u.role
+    FROM users u
+    WHERE u.id = '%s'
     """ % user_id).fetchone()
 
     if user is None:
