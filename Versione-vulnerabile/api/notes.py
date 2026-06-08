@@ -1,4 +1,6 @@
-from flask import Blueprint
+from flask import Blueprint, request, jsonify
+from db import get_db
+
 notes_bp = Blueprint('notes', __name__)
 
 # 1) Read all - GET /api/notes
