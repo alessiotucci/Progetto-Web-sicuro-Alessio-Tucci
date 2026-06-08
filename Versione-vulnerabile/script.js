@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`Login riuscito! Ruolo: ${result.user.role}`);
             localStorage.setItem('user', JSON.stringify(result.user));
 			updateNavbar();
+			loadDashboardView()
             my_navigateTo('/dashboard');
         }
 		else
@@ -66,13 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 	// 2. Configurazione Sign Up con Auto-Login
-	registerFormHandler('form-signup', '/api/signup', (result) => {
+	registerFormHandler('form-signup', '/api/users', (result) => {
     if (result.success)
 		{
         alert(`Registrazione completata! Benvenuto ${result.user.username}.`);
         // Esegue l'auto-login salvando i dati ricevuti dal backend
         localStorage.setItem('user', JSON.stringify(result.user));
         updateNavbar();
+		loadDashboardView()
         my_navigateTo('/dashboard');
     }
 	else

@@ -39,15 +39,16 @@ def create_user():
     #TODO: no auth service, no check admin role, no cleaning input
     username = data['username']
     password = data['password']
-    role = data['role']
+    role = 'user' #role = data['role']
 
-    db.execute(
+    cursor = db.execute(
             "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
             (username, password, role)
             )
+    user_id = cursor.lastrowid
     db.commit()
 
-    return jsonify({'message': 'User created'}), 201
+    return jsonify({'message': 'User created', 'id': user_id}), 201
 
 # 4) Update - PUT /api/users/<user_id>
 @users_bp.route('/<user_id>', methods=['PUT'])
