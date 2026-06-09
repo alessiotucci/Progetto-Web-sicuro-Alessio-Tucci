@@ -2,6 +2,8 @@ console.log("Script for the vulnerable version!");
 
 import { registerFormHandler } from './auth.js';
 import { updateNavbar } from './navbar.js';
+import { loadDashboardView} from './dashboard.js';
+import { initBookingForm, openBooking, closeBooking } from './booking.js';
 
 // Dictionary in Javascript, usefull to create my routes
 const routes = {
@@ -44,6 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		{
             e.preventDefault(); // Previene il reload della pagina
             my_navigateTo(e.target.getAttribute('href'));
+			//boh
+			initBookingForm();
         }
     });
 
@@ -100,6 +104,6 @@ document.body.addEventListener('click', e => {
 
         // Gestione standard del routing per gli altri link
         e.preventDefault();
-        navigateTo(e.target.getAttribute('href'));
+        my_navigateTo(e.target.getAttribute('href'));
     }
 });

@@ -1,6 +1,7 @@
 // Versione-vulnerabile/auth.js
 
 /* Export the function ! */
+/* Very useful function, it create a package and then send a POST request */
 export function registerFormHandler(formId, endpoint, callback)
 {
     const form = document.getElementById(formId);

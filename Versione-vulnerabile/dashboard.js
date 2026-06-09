@@ -1,3 +1,5 @@
+/* call the api of the machine*/
+/* instead it should check the session right? */
 export async function loadDashboardView()
 {
 	try
