@@ -4,7 +4,7 @@ import sqlite3
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/api/login', methods=['POST'])
+@auth_bp.route('/login', methods=['POST'])
 def login():
     # Estrae i dati JSON inviati dal front-end
     data = request.get_json()
@@ -49,7 +49,8 @@ def login():
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
 
 
-@auth_bp.route('/api/signup', methods=['POST'])
+#TODO: codice duplicato con la create user!!
+@auth_bp.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
     if not data or 'username' not in data or 'password' not in data:

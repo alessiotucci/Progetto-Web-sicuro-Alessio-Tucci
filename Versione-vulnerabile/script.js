@@ -1,11 +1,10 @@
-console.log("Script for the vulnerable version!");
-
 import { registerFormHandler } from './auth.js';
 import { updateNavbar } from './navbar.js';
-import { loadDashboardView} from './dashboard.js';
+import { loadDashboardView } from './dashboard.js';
 import { initBookingForm, openBooking, closeBooking } from './booking.js';
+import { loadAdminView } from './admin.js';
+import { loadFeedback, initFeedbackForm } from './feedback.js';
 
-// Dictionary in Javascript, usefull to create my routes
 const routes = {
     '/': 'view-home',
     '/login': 'view-login',
@@ -14,96 +13,96 @@ const routes = {
     '/admin': 'view-admin'
 };
 
-// Router function, check for the path, hide the other div (using remove).
-// Add the class active only tho the Active view!
-function router()
-{
+function router() {
     const path = window.location.pathname;
-    const idActiveView = routes[path] || 'view-home'; // fallback to view the home page
+    const idActiveView = routes[path] || 'view-home';
 
     document.querySelectorAll('.view').forEach(view => {
         view.classList.remove('active');
     });
+    
     const viewToShow = document.getElementById(idActiveView);
-    if (viewToShow)
-	{
+    if (viewToShow) {
         viewToShow.classList.add('active');
+    }
+
+    // Esegui fetch specifiche in base alla vista caricata
+    if (path === '/dashboard') {
+        loadDashboardView();
+        loadFeedback();
+    } else if (path === '/admin') {
+        loadAdminView();
     }
 }
 
-// Funzione per cambiare rotta via codice
 function my_navigateTo(url)
 {
     history.pushState(null, null, url);
     router();
 }
 
-// Inizializzazione degli eventi al caricamento del DOM
-
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Inizializza i form (Booking e Feedback)
+    initBookingForm();
+    initFeedbackForm();
+
+    // 2. Event Delegation globale per la Navbar (Link e Logout)
     document.body.addEventListener('click', e => {
-        if (e.target.matches('.nav-link'))
-		{
-            e.preventDefault(); // Previene il reload della pagina
-            my_navigateTo(e.target.getAttribute('href'));
-			//boh
-			initBookingForm();
+        if (e.target.matches('.nav-link')) {
+            e.preventDefault();
+            if (e.target.classList.contains('logout-action')) {
+                localStorage.removeItem('user');
+                updateNavbar();
+                my_navigateTo('/');
+            } else {
+                my_navigateTo(e.target.getAttribute('href'));
+            }
         }
     });
 
+    // 3. Event Delegation per la Dashboard (Bottoni Book e chiusura Modale)
+    document.getElementById('view-dashboard').addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-book');
+        if (btn && !btn.disabled) {
+            const machineId = btn.closest('.card').id.replace('mach-', '');
+            openBooking(machineId);
+        }
+    });
+    
+    document.querySelector('#modal-booking button[type="button"]').addEventListener('click', closeBooking);
+
+    // 4. Inizializzazione Router e Auth Forms
     window.addEventListener('popstate', router);
     router();
-	updateNavbar();
+    updateNavbar();
 
-	// Gestione del Submit del Form di Login utilizzando la funzione importata da auth.js
-    registerFormHandler('form-login', '/api/login', (result) => {
-        if (result.success) {
-            alert(`Login riuscito! Ruolo: ${result.user.role}`);
-            localStorage.setItem('user', JSON.stringify(result.user));
-			updateNavbar();
-			loadDashboardView()
-            my_navigateTo('/dashboard');
-        }
-		else
-		{
-            alert(`Errore Login: ${result.message || result.error}`);
-        }
-    });
-
-	// 2. Configurazione Sign Up con Auto-Login
-	registerFormHandler('form-signup', '/api/users', (result) => {
-    if (result.success)
-		{
-        alert(`Registrazione completata! Benvenuto ${result.user.username}.`);
-        // Esegue l'auto-login salvando i dati ricevuti dal backend
-        localStorage.setItem('user', JSON.stringify(result.user));
-        updateNavbar();
-		loadDashboardView()
-        my_navigateTo('/dashboard');
-    }
+    registerFormHandler('form-login', '/api/auth/login', (result) => {
+	//TODO: login part
+	const errorContainer = document.getElementById('login-error');
+	if (errorContainer)
+		errorContainer.textContent = '';
+	if (result.success)
+	{
+		localStorage.setItem('user', JSON.stringify(result.user));
+		updateNavbar();
+		my_navigateTo('/dashboard');
+	}
 	else
 	{
-        alert(`Errore Registrazione: ${result.message || result.error}`);
-    }
-	});
-});
+		if (errorcontainer)
+			errorContainer.textContent = result.message || result.error || "Invalid username or password";
+	}
+    });
 
-// Gestione dei click sui link della navbar in script.js
-document.body.addEventListener('click', e => {
-    if (e.target.matches('.nav-link')) {
-        
-        // Intercetta l'azione di logout tramite la classe dedicata
-        if (e.target.classList.contains('logout-action')) {
-            e.preventDefault();
-            
-            localStorage.removeItem('user'); // Cancella l'oggetto utente dal browser
-            updateNavbar();                  // Ripristina i link originali della navbar
-            my_navigateTo('/');                 // Reindirizza alla home
-            return;
+    registerFormHandler('form-signup', '/api/users', (result) => {
+        if (result.success || result.user) {
+            // Adatta il risultato in base a cosa restituisce esattamente il tuo backend
+            const user = result.user || { username: 'Nuovo Utente' }; 
+            localStorage.setItem('user', JSON.stringify(user));
+            updateNavbar();
+            my_navigateTo('/dashboard');
+        } else {
+            alert(`Errore Registrazione: ${result.message || result.error}`);
         }
-
-        // Gestione standard del routing per gli altri link
-        e.preventDefault();
-        my_navigateTo(e.target.getAttribute('href'));
-    }
+    });
 });
