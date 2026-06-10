@@ -51,7 +51,7 @@ def create_session():
     #WHERE IS THE SESSION ID, CMON BRO???
 
     db.execute(
-            "INSERT INTO sessions (user_id, machine_id, started_at, ended_at) VALUE (?, ?, ?, ?)"
+            "INSERT INTO sessions (user_id, machine_id, started_at, ended_at) VALUES (?, ?, ?, ?)"
             , (user_id, machine_id, started_at, ended_at))
     db.commit()
 

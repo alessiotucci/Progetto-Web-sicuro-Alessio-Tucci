@@ -10,6 +10,7 @@ const routes = {
     '/login': 'view-login',
     '/signup': 'view-signup',
     '/dashboard': 'view-dashboard',
+	'/profile': 'view-profile', // new shit
     '/admin': 'view-admin'
 };
 
@@ -27,12 +28,19 @@ function router() {
     }
 
     // Esegui fetch specifiche in base alla vista caricata
-    if (path === '/dashboard') {
+    if (path === '/dashboard')
+	{
         loadDashboardView();
         loadFeedback();
-    } else if (path === '/admin') {
+    }
+	else if (path === '/admin')
+	{
         loadAdminView();
     }
+	else if (path === '/profile')
+	{
+		loadProfileView();
+	}
 }
 
 function my_navigateTo(url)
@@ -85,10 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	{
 		localStorage.setItem('user', JSON.stringify(result.user));
 		updateNavbar();
-		my_navigateTo('/dashboard');
+		my_navigateTo('/profile');
 	}
 	else
 	{
+		alert("wrong credentials!! :(");
 		if (errorcontainer)
 			errorContainer.textContent = result.message || result.error || "Invalid username or password";
 	}

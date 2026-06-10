@@ -18,6 +18,7 @@
 				<a href="/login" class="nav-link" id="nav-auth">Login</a>
 				<a href="/signup" class="nav-link" id="nav-profile">Sign Up</a>
 				<a href="/dashboard" class="nav-link">Dashboard</a>
+				<!-- Admin panel is hidden now-->
 				<a href="/admin" class="nav-link" id="nav-admin" style="display: none;">Admin</a>
 			</nav>
 		</header>
@@ -83,16 +84,18 @@
 <!-- -->
 <div id="modal-booking" style="display: none; background: #eee; padding: 15px; margin-top: 20px; border: 1px solid #ccc;">
     <h3>Book Machine <span id="modal-machine-name"></span></h3>
-    <form id="form-booking">
-        <input type="hidden" name="machine_id" id="modal-machine-id">
-        <input type="hidden" name="user_id" id="modal-user-id">
-
-        <label>Duration (Hours):</label>
-        <input type="number" name="hours" min="1" max="2" required><br><br>
-
-        <button type="submit">Confirm Booking</button>
-        <button type="button">Cancel</button>
-    </form>
+	<form id="form-booking">
+		<input type="hidden" name="machine_id" id="modal-machine-id">
+		<input type="hidden" name="user_id" id="modal-user-id">
+	
+		<label>Data Inizio (YYYY-MM-DD HH:MM):</label>
+		<input type="text" name="started_at" placeholder="2026-06-10 15:00" required><br>
+	
+		<label>Data Fine (YYYY-MM-DD HH:MM):</label>
+		<input type="text" name="ended_at" placeholder="2026-06-10 17:00" required><br><br>
+	
+		<button type="submit">Confirm Booking</button>
+	</form>
 </div>
 <!-- -->
 		
