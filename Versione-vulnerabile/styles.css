@@ -101,27 +101,6 @@ nav a
 	height: 2.5rem;            /* altezza del footer */
   }
 
-/******************/
-/* Small and easy */
-/******************/
-/* Modal Design */
-#modal-booking {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    z-index: 1000;
-}
-
-#modal-booking .modal-content {
-    background: white;
-    width: 90%;
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    border-radius: 15px;
-}
-
 /******************************************************************************/
 /*Gemini suggestion for the CSS for editing the booking, be wise about CSS !***/
 /******************************************************************************/
