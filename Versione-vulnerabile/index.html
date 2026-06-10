@@ -88,14 +88,12 @@
 		<input type="hidden" name="machine_id" id="modal-machine-id">
 		<input type="hidden" name="user_id" id="modal-user-id">
 	
-		<label>Data Inizio (YYYY-MM-DD HH:MM):</label>
-		<input type="text" name="started_at" placeholder="2026-06-10 15:00" required><br>
-	
-		<label>Data Fine (YYYY-MM-DD HH:MM):</label>
-		<input type="text" name="ended_at" placeholder="2026-06-10 17:00" required><br><br>
-	
-		<button type="button">Close</button>
-		<button type="submit">Confirm Booking</button>
+			<label>Inizio Prenotazione:</label>
+            <input type="datetime-local" name="started_at" required>
+            <label>Fine Prenotazione:</label>
+            <input type="datetime-local" name="ended_at" required>
+			<button type="button">Close</button>
+			<button type="submit">Confirm Booking</button>
 	</form>
 </div>
 <!-- -->
@@ -125,11 +123,25 @@
 
 		<!-- 6) Profile -->
 		<div id="view-profile" class="view">
-		    <h2>My Profile</h2>
-		    <p id="profile-username"></p>
+		    <h2>Le Tue Prenotazioni</h2>
+		    <div id="my-sessions-container" class="cards-container">
+		        </div>
+		</div>
 		
-		    <h3>My Bookings</h3>
-		    <div id="my-sessions-container">Loading...</div>
+		<div id="modal-edit-session">
+		    <div class="modal-content">
+		        <h3>Modifica Orario <span id="edit-machine-name"></span></h3>
+		        <form id="form-edit-session">
+		            <input type="hidden" id="edit-session-id">
+		            <input type="hidden" id="edit-started-at"> <label>Nuova Data e Ora di Fine:</label>
+		            <input type="datetime-local" id="edit-ended-at" required>
+		
+		            <div class="modal-actions">
+		                <button type="submit" class="btn-edit-confirm">Aggiorna</button>
+		                <button type="button" class="btn-cancel" onclick="closeEditSession()">Annulla</button>
+		            </div>
+		        </form>
+		    </div>
 		</div>
 		</main>
 

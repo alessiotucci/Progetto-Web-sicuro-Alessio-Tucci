@@ -3,7 +3,7 @@ import { updateNavbar } from './navbar.js';
 import { loadDashboardView, startDashboardPolling, stopDashboardPolling } from './dashboard.js';
 import { initBookingForm, openBooking, closeBooking } from './booking.js';
 import { loadAdminView } from './admin.js';
-import { loadProfileView } from './profile.js';
+import { loadProfileView, handleEditSession } from './profile.js';
 import { loadFeedback, initFeedbackForm } from './feedback.js';
 
 const routes = {
@@ -96,6 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
     router();
     updateNavbar();
 
+	// 5. Provo a piazzarlo qui ...
+	const formEditSession = document.getElementById('form-edit-session');
+	if (formEditSession)
+	{
+    	formEditSession.addEventListener('submit', handleEditSession);
+	}
+
     registerFormHandler('form-login', '/api/auth/login', (result) => {
 	//TODO: login part
 	console.log("DEBUG: try to understand!!");
@@ -110,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 	else
 	{
-		alert("wrong credentials!! :(");
+		//alert("wrong credentials!! :(");
 		if (errorContainer)
 			errorContainer.textContent = result.message || result.error || "Invalid username or password";
 	}
