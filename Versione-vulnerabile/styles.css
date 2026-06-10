@@ -3,6 +3,10 @@ body
 {
     font-family: Arial, sans-serif;
     margin: 20px;
+/*    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem; */
 }
 
 nav

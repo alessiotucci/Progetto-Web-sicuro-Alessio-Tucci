@@ -12,7 +12,7 @@ export function registerFormHandler(formId, endpoint, callback)
         e.preventDefault();
         const formData = new FormData(form);
         const payload = Object.fromEntries(formData.entries());
-
+		console.log("DEBUG di atucci: FUNCTION FOR POST");
         try
 		{
             const response = await fetch(endpoint, {

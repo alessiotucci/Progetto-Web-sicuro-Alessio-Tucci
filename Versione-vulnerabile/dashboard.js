@@ -1,40 +1,64 @@
-/* call the api of the machine*/
-/* instead it should check the session right? */
-export async function loadDashboardView()
-{
-	try
-	{
-		// 1. Chiama l'API
-		const response = await fetch('/api/machines/');
-		const machines = await response.json();
-		// 2. Itera sui risultati e aggiorna l'HTML
-		machines.forEach(machine => {
-			const card = document.getElementById(`mach-${machine.id}`);
-			if (!card) return; // Salta se la card non esiste nell'HTML
+// new dashboard function
+export async function loadDashboardView() {
+    try {
+        // Step 1: fetch both in parallel
+        const [machinesRes, sessionsRes] = await Promise.all([
+            fetch('/api/machines/'),
+            fetch('/api/sessions/')
+        ]);
+        const machines = await machinesRes.json();
+        const sessions = await sessionsRes.json();
 
-			const statusSpan = card.querySelector('.status-text');
-			const button = card.querySelector('.btn-book');
+        const now = new Date();
 
-			// Aggiorna il testo dello stato
-			statusSpan.textContent = machine.status;
+        // Step 2: compute real status for each machine
+        const enriched = machines.map(machine => {
+            const activeSession = sessions.find(s => {
+                const start = new Date(s.started_at);
+                const end   = new Date(s.ended_at);
+                return s.machine_name === machine.name && now >= start && now <= end;
+            });
 
-			// Logica visiva in base allo stato
-			if (machine.status.toLowerCase() !== 'available')
-			{
-				statusSpan.style.color = 'red';
-				button.textContent = 'Occupata';
-				button.disabled = true;
-			}
-			else
-			{
-				statusSpan.style.color = 'green';
-				button.textContent = 'Book';
-				button.disabled = false;
-			}
-		});
-	}
-	catch (error)
-	{
-		console.error("Errore nel caricamento delle macchine:", error);
-	}
+            return {
+                ...machine,
+                status: activeSession ? 'In Use' : 'Available',
+                usedBy: activeSession ? activeSession.username : null,
+                until:  activeSession ? activeSession.ended_at  : null
+            };
+        });
+
+        // Step 3: update the cards
+        enriched.forEach(machine => {
+            const card = document.getElementById(`mach-${machine.id}`);
+            if (!card) return;
+
+            const statusText = card.querySelector('.status-text');
+            const bookBtn    = card.querySelector('.btn-book');
+
+            if (machine.status === 'In Use') {
+                statusText.textContent = `In Use by ${machine.usedBy} until ${machine.until}`;
+                statusText.style.color = 'red';
+                bookBtn.disabled = true;
+            } else {
+                statusText.textContent = 'Available';
+                statusText.style.color = 'green';
+                bookBtn.disabled = false;
+            }
+        });
+
+    } catch (e) {
+        console.error("Error loading dashboard", e);
+    }
+}
+
+// Step 4: real-time polling
+let pollingInterval = null;
+
+export function startDashboardPolling() {
+    loadDashboardView(); // immediate first load
+    pollingInterval = setInterval(loadDashboardView, 30000);
+}
+
+export function stopDashboardPolling() {
+    clearInterval(pollingInterval);
 }

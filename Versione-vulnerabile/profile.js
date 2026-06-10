@@ -3,7 +3,8 @@ export async function loadProfileView() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (!user) return;
 
-    try {
+    try
+	{
         const res = await fetch('/api/sessions/');
         const sessions = await res.json();
         
@@ -15,7 +16,9 @@ export async function loadProfileView() {
         container.innerHTML = mySessions.map(s => `
             <div>Macchina: ${s.machine_name} | Inizio: ${s.started_at}</div>
         `).join('');
-    } catch (e) {
+    }
+	catch (e)
+	{
         console.error("Errore caricamento profilo", e);
     }
 }

@@ -1,8 +1,9 @@
 import { registerFormHandler } from './auth.js';
 import { updateNavbar } from './navbar.js';
-import { loadDashboardView } from './dashboard.js';
+import { loadDashboardView, startDashboardPolling, stopDashboardPolling } from './dashboard.js';
 import { initBookingForm, openBooking, closeBooking } from './booking.js';
 import { loadAdminView } from './admin.js';
+import { loadProfileView } from './profile.js';
 import { loadFeedback, initFeedbackForm } from './feedback.js';
 
 const routes = {
@@ -14,7 +15,9 @@ const routes = {
     '/admin': 'view-admin'
 };
 
-function router() {
+//1) first function, the router function
+function router()
+{
     const path = window.location.pathname;
     const idActiveView = routes[path] || 'view-home';
 
@@ -23,26 +26,35 @@ function router() {
     });
     
     const viewToShow = document.getElementById(idActiveView);
-    if (viewToShow) {
+    if (viewToShow)
+	{
         viewToShow.classList.add('active');
     }
 
     // Esegui fetch specifiche in base alla vista caricata
     if (path === '/dashboard')
 	{
-        loadDashboardView();
+//        loadDashboardView();
+		startDashboardPolling();
         loadFeedback();
     }
 	else if (path === '/admin')
 	{
+		stopDashboardPolling();
         loadAdminView();
     }
 	else if (path === '/profile')
 	{
+		stopDashboardPolling();
 		loadProfileView();
+	}
+	else
+	{
+		stopDashboardPolling();
 	}
 }
 
+//2) custom function to navigate to a URL
 function my_navigateTo(url)
 {
     history.pushState(null, null, url);
@@ -86,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     registerFormHandler('form-login', '/api/auth/login', (result) => {
 	//TODO: login part
+	console.log("DEBUG: try to understand!!");
 	const errorContainer = document.getElementById('login-error');
 	if (errorContainer)
 		errorContainer.textContent = '';
@@ -98,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	else
 	{
 		alert("wrong credentials!! :(");
-		if (errorcontainer)
+		if (errorContainer)
 			errorContainer.textContent = result.message || result.error || "Invalid username or password";
 	}
     });
