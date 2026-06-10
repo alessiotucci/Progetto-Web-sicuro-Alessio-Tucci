@@ -112,15 +112,21 @@
 
 		<!--5) Admin -->
 		<div id="view-admin" class="view">
-			<h2> Admin panel - check who is using the washing machine</h2>
-			<p>If you are able to see this page without the credentials, this web-page is unsafe</p>
-				<h3>Utenti	Registrati</h3>
-				<div	id="admin-users-container">Caricamento...</div>
-
-				<h3>Prenotazioni	Attive	(Sessioni)</h3>
-				<div	id="admin-sessions-container">Caricamento...</div>
+		    <h2>Pannello di Amministrazione</h2>
+		    <p>Gestione avanzata del sistema. (Vulnerabilità attiva: Broken Access Control)</p>
+		    
+		    <div class="admin-section">
+		        <h3>Gestione Utenti Registrati</h3>
+		        <div class="table-responsive" id="admin-users-container">
+		            </div>
+		    </div>
+		
+		    <div class="admin-section">
+		        <h3>Gestione Globale Prenotazioni</h3>
+		        <div class="table-responsive" id="admin-sessions-container">
+		            </div>
+		    </div>
 		</div>
-
 		<!-- 6) Profile -->
 		<div id="view-profile" class="view">
 		    <h2>Le Tue Prenotazioni</h2>

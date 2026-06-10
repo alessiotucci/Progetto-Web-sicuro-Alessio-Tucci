@@ -101,75 +101,30 @@ nav a
 	height: 2.5rem;            /* altezza del footer */
   }
 
-
-/* Modal Overlay (Sfondo scuro) */
+/******************/
+/* Small and easy */
+/******************/
+/* Modal Design */
 #modal-booking {
-    display: none; 
+    display: none;
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    padding: 15px;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
 }
 
-#modal-booking.active {
-    display: flex; /* Mostra il modal */
-}
-
-/* Modal Content Box */
-.modal-content {
-    background: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 350px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-/* Form Styles */
-.modal-content label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #333;
-}
-
-.modal-content input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-
-/* Buttons */
-.modal-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.modal-actions button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
+#modal-booking .modal-content {
+    background: white;
+    width: 90%;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 15px;
 }
 
 /******************************************************************************/
 /*Gemini suggestion for the CSS for editing the booking, be wise about CSS !***/
 /******************************************************************************/
-
 /* Stile specifico per le card del profilo */
 .profile-card {
     border-top: 5px solid #28a745;
@@ -214,3 +169,88 @@ nav a
 }
 /******************************************************************************/
 
+/******************************************************************************/
+/*Gemini suggestion for the CSS for editing the booking, be wise about CSS !***/
+/******************************************************************************/
+/* --- STILI PANNELLO ADMIN --- */
+.admin-section {
+    margin-bottom: 40px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.95rem;
+}
+
+.admin-table th, .admin-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-table th {
+    background-color: #343a40;
+    color: #ffffff;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.admin-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Badge e Bottoni Admin */
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.action-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    transition: opacity 0.2s;
+}
+
+.btn-small:hover { opacity: 0.8; }
+
+/* Colori di utilità */
+.bg-red { background-color: #dc3545; }
+.bg-blue { background-color: #007bff; }
+.bg-orange { background-color: #fd7e14; }
+.bg-green { background-color: #28a745; }
+.bg-dark { background-color: #343a40; }
+
+
+/* Stile del bottone Disabilitato (Gray effect) */
+.btn-book:disabled {
+    background-color: #cccccc !important; /* Grigio */
+    color: #666666 !important;
+    cursor: not-allowed !important;       /* Icona 'divieto' al passaggio del mouse */
+    opacity: 0.7;
+    box-shadow: none;
+    transform: none;                      /* Rimuove effetti di animazione */
+}

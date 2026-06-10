@@ -9,7 +9,7 @@ def get_users():
     db = get_db()
     #TODO: no auth service, no check admin role, not cleaning input
     users = db.execute("""
-    SELECT username, role
+    SELECT username, role, id
     FROM users
     """).fetchall()
 
@@ -61,7 +61,8 @@ def update_users(user_id):
     password = data['password']
 
     db.execute(
-            "UPDATE users SET username = ?, password = ?", (username, password)
+            "UPDATE users SET username = ?, password = ? WHERE id = ?",
+            (username, password, user_id)
             )
     db.commit()
 

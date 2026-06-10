@@ -2,7 +2,7 @@ import { registerFormHandler } from './auth.js';
 import { updateNavbar } from './navbar.js';
 import { loadDashboardView, startDashboardPolling, stopDashboardPolling } from './dashboard.js';
 import { initBookingForm, openBooking, closeBooking } from './booking.js';
-import { loadAdminView } from './admin.js';
+import { loadAdminView, toggleUserRole, deleteUser } from './admin.js';
 import { loadProfileView, handleEditSession } from './profile.js';
 import { loadFeedback, initFeedbackForm } from './feedback.js';
 

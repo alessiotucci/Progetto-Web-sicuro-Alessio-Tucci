@@ -39,6 +39,7 @@ export async function loadDashboardView() {
                 statusText.textContent = `In Use by ${machine.usedBy} until ${machine.until}`;
                 statusText.style.color = 'red';
                 bookBtn.disabled = true;
+                bookBtn.color = 'red';
             } else {
                 statusText.textContent = 'Available';
                 statusText.style.color = 'green';
