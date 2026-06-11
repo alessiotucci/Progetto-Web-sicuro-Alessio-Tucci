@@ -41,21 +41,22 @@ def create_note():
     db = get_db()
     data = request.get_json()
 
-    #TODO: no auth service, no check admin role, no cleaing input
-    note_id = data['id']
-    user_id = data['user_id']
-    machine_id = data['machine_id']
-    content = data['content']
-    #created_at ???
+    user_id = data.get('user_id')
+    machine_id = data.get('machine_id')
+    content = data.get('content')
 
-    db.execute(
-            "INSERT INTO notes (id, user_id, machine_id, content) VALUE (?, ?, ?, ?)"
-            , (note_id, user_id, machine_id, content)
-            )
+    if not user_id or not machine_id or not content:
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    cursor = db.execute(
+        "INSERT INTO notes (user_id, machine_id, content) VALUES (?, ?, ?)",
+        (user_id, machine_id, content)
+    )
     db.commit()
+    
+    note_id = cursor.lastrowid
 
     return jsonify({'message': 'Note created', 'id': note_id}), 201
-
 
 # 4) Update - PUT /api/notes/<note_id>
 @notes_bp.route('/<note_id>', methods=['PUT'])

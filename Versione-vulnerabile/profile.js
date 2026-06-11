@@ -12,30 +12,56 @@ export async function loadProfileView() {
     if (!user) return;
 
     try {
-        const res = await fetch('/api/sessions/');
-        const sessions = await res.json();
+        // Fetch Prenotazioni
+        const resSessions = await fetch('/api/sessions/');
+        const sessions = await resSessions.json();
 
-        // VULNERABILITÀ: L'attaccante vede il traffico di rete con tutti i dati.
+        // VULNERABILITÀ: L'attaccante vede il traffico di rete con tutti i dati (Insecure Direct Object Reference / Data Exposure).
+        // FIX FUTURO: L'API dovrebbe restituire SOLO le prenotazioni dell'utente autenticato (es. /api/sessions/me).
         const mySessions = sessions.filter(s => s.username === user.username);
-        const container = document.getElementById('my-sessions-container');
+        const containerSessions = document.getElementById('my-sessions-container');
 
         if (mySessions.length === 0) {
-            container.innerHTML = '<p style="text-align:center; width:100%;">Nessuna prenotazione attiva.</p>';
-            return;
+            containerSessions.innerHTML = '<p style="text-align:center; width:100%; color: var(--color-text-muted);">Nessuna prenotazione attiva.</p>';
+        } else {
+            // Creazione dinamica delle Card con i pulsanti Modifica e Annulla
+            containerSessions.innerHTML = mySessions.map(s => `
+                <div class="card profile-card">
+                    <h3>${s.machine_name}</h3>
+                    <p><strong>Inizio:</strong> <br>${formatDisplayDate(s.started_at)}</p>
+                    <p><strong>Fine:</strong> <br>${formatDisplayDate(s.ended_at)}</p>
+                    <div class="card-actions">
+                        <button class="btn-edit" onclick="openEditSession(${s.id}, '${s.machine_name}', '${s.started_at}', '${s.ended_at}')">Modifica</button>
+                        <button class="btn-delete" onclick="deleteSession(${s.id})">Annulla</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // Creazione dinamica delle Card con i pulsanti Modifica e Annulla
-        container.innerHTML = mySessions.map(s => `
-            <div class="card profile-card">
-                <h3>${s.machine_name}</h3>
-                <p><strong>Inizio:</strong> <br>${formatDisplayDate(s.started_at)}</p>
-                <p><strong>Fine:</strong> <br>${formatDisplayDate(s.ended_at)}</p>
-                <div class="card-actions">
-                    <button class="btn-edit" onclick="openEditSession(${s.id}, '${s.machine_name}', '${s.started_at}', '${s.ended_at}')">Modifica</button>
-                    <button class="btn-delete" onclick="deleteSession(${s.id})">Annulla</button>
+        // Fetch Segnalazioni
+        // VULNERABILITÀ: Passaggio dell'ID utente in chiaro e recupero di tutte le note (potenziale Broken Access Control).
+        // FIX FUTURO: L'API non dovrebbe richiedere user_id, ma ricavarlo dal token di sessione.
+        const resNotes = await fetch(`/api/notes`); // Modificato per seguire l'anti-pattern: carichiamo tutto
+        const notes = await resNotes.json();
+        
+        // Filtriamo lato client come richiesto dall'anti-pattern
+        const myNotes = notes.filter(n => n.user_id === user.id);
+        const containerNotes = document.getElementById('my-notes-container');
+        
+        if (myNotes.length === 0) {
+            containerNotes.innerHTML = '<p style="text-align:center; width:100%; color: var(--color-text-muted);">Non hai segnalato alcun problema.</p>';
+        } else {
+            // Creazione dinamica delle Card per le note
+            // VULNERABILITÀ: Stored XSS - il contenuto della nota (n.content) viene inserito direttamente nel DOM senza sanitizzazione.
+            // FIX FUTURO: Usare textContent o una libreria di sanitizzazione come DOMPurify.
+            containerNotes.innerHTML = myNotes.map(n => `
+                <div class="card profile-card" style="border-top-color: var(--color-danger)">
+                    <h3>Macchina ID: ${n.machine_id}</h3>
+                    <p><strong>Segnalazione:</strong> ${n.content}</p>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        }
+
     } catch (e) {
         console.error("Errore caricamento profilo", e);
     }

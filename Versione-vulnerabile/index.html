@@ -10,7 +10,6 @@
 		</script>
 	</head>
 	<body>
-
 		<!-- cute header to navigate the page! s-->
 		<header>
 			<nav>
@@ -25,93 +24,132 @@
 
 		<!-- Careful, you rename it with my_app!-->
 		<main id="my_app">
-
 		<!--1) Home -->
 		<div id="view-home" class="view active">
 			<h1> Welcome to the washing machine pages</h1>
 			<p> To start, create an account or log in!</p>
 		</div>
-		
 		<!--2) Login -->
 		<div id="view-login" class="view">
-			<h2>Log in!</h2>
-			<form id="form-login"> <!--  method="POST"-->
-				<input type="text" name="username" placeholder="Username" required><br><br>
-                <input type="password" name="password" placeholder="Password" required><br><br>
-                <button type="submit">Log in</button>
-			</form>
-			<div id="login-error" style="color: red;"></div> <!---->
-		</div>
-		
-		<!--3) Signup -->
-		<div id="view-signup" class="view">
-			<h2>Sign up!</h2>
-			<form id="form-signup">
-				<input type="text" name="username" placeholder="Username" required> <br><br>
-				<input type="password" name="password" placeholder="Password" required> <br><br>
-				<button type="submit">Sign up</button>
-			</form>
-
-		</div>
-
+            <div class="auth-card">
+                <h2>Log in</h2>
+                <p class="auth-subtitle">Inserisci le tue credenziali per accedere.</p>
+                <form id="form-login">
+                    <div class="form-group">
+                        <label for="login-username">Username</label>
+                        <input type="text" id="login-username" name="username" placeholder="Es. mario.rossi" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" name="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">Log in</button>
+                </form>
+                <div id="login-error" class="error-msg"></div>
+            </div>
+        </div>
+		<!-- 3) Signup -->
+        <div id="view-signup" class="view">
+            <div class="auth-card">
+                <h2>Sign up</h2>
+                <p class="auth-subtitle">Crea un nuovo account.</p>
+                <form id="form-signup">
+                    <div class="form-group">
+                        <label for="signup-username">Username</label>
+                        <input type="text" id="signup-username" name="username" placeholder="Es. mario.rossi" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" name="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">Sign up</button>
+                </form>
+            </div>
+        </div>
 		<!-- Dashboard view ! -->
 		<div id="view-dashboard" class="view">
 		    <h2>Current Status</h2>
+            <div class="md-clock">
+                <span id="clock-display">00:00:00</span>
+            </div>
 		    <div class="cards-container">
 		        <div class="card" id="mach-l1">
 		            <h3>Lavatrice 1</h3>
 					<img src="../shared/lavatrice-1.jpg">
 		            <p class="status">Status: <span class="status-text">Loading...</span></p>
-		            <button class="btn-book">book</button>
+		            <button class="btn-book">Prenota</button>
+					<button class="btn-report">Segnala un problema</button>
 		        </div>
 		        <div class="card" id="mach-l2">
 		            <h3>Lavatrice 2</h3>
 					<img src="../shared/lavatrice-2.jpg">
 		            <p class="status">Status: <span class="status-text">Loading...</span></p>
-		            <button class="btn-book">book</button>
+		            <button class="btn-book">Prenota</button>
+					<button class="btn-report">Segnala un problema</button>
 		        </div>
 		        <div class="card" id="mach-a1">
 		            <h3>Asciugatrice 1</h3>
 					<img src="../shared/asciugatrice.jpg">
 		            <p class="status">Status: <span class="status-text">Loading...</span></p>
-		            <button class="btn-book">book</button>
+		            <button class="btn-book">Prenota</button>
+					<button class="btn-report">Segnala un problema</button>
 		        </div>
 		    </div>
 
-<!-- Modal booking -->
-<div id="modal-booking" style="display: none; background: #eee; padding: 15px; margin-top: 20px; border: 1px solid #ccc;">
-    <h3>Book Machine <span id="modal-machine-name"></span></h3>
-	<form id="form-booking">
-		<input type="hidden" name="machine_id" id="modal-machine-id">
-		<input type="hidden" name="user_id" id="modal-user-id">
-	
-			<label>Inizio Prenotazione:</label>
-            <input type="datetime-local" name="started_at" required>
-            <label>Fine Prenotazione:</label>
-            <input type="datetime-local" name="ended_at" required>
-			<button type="button">Close</button>
-			<button type="submit">Confirm Booking</button>
-	</form>
+<!-- *********************************************************************** -->
+<div id="modal-booking" class="modal-overlay">
+    <div class="modal-content">
+        <!-- Machine preview: mirrors the card the user just clicked -->
+        <div class="modal-header">
+            <div class="modal-machine-preview">
+                <img id="modal-machine-img" src="" alt="Selected machine">
+                <div class="modal-machine-info">
+                    <span class="modal-machine-label">Booking</span>
+                    <h3 id="modal-machine-name">—</h3>
+                </div>
+            </div>
+            <button type="button" class="btn-modal-close" id="btn-close-booking">✕</button>
+        </div>
+        <form id="form-booking" autocomplete="off">
+            <!-- Hidden fields — values are set by booking.js, not by the user -->
+            <input type="hidden" name="machine_id"  id="modal-machine-id">
+            <input type="hidden" name="user_id"     id="modal-user-id">
+            <input type="hidden" name="started_at"  id="modal-started-at">
+            <input type="hidden" name="ended_at"    id="modal-ended-at">
+ 
+            <!-- Time summary: auto-computed, shown read-only -->
+            <div class="booking-time-display">
+                <div class="time-slot">
+                    <span class="time-label">From</span>
+                    <span class="time-value" id="display-start-time">--:--</span>
+                </div>
+                <div class="time-arrow">→</div>
+                <div class="time-slot">
+                    <span class="time-label">Until</span>
+                    <span class="time-value" id="display-end-time">--:--</span>
+                </div>
+            </div>
+            <!-- Duration picker: user picks a preset, JS calculates the end time -->
+            <div class="duration-picker">
+                <p class="duration-label">Duration</p>
+                <div class="duration-buttons">
+                    <button type="button" class="btn-duration" data-minutes="30">30 min</button>
+                    <button type="button" class="btn-duration active" data-minutes="60">1 h</button>
+                    <button type="button" class="btn-duration" data-minutes="90">1.5 h</button>
+                    <button type="button" class="btn-duration" data-minutes="120">2 h</button>
+                    <button type="button" class="btn-duration" data-minutes="180">3 h</button>
+                </div>
+            </div>
+ 
+            <button type="submit" class="btn-primary btn-full">Confirm Booking</button>
+        </form>
+    </div>
 </div>
-<!-- -->
-		
-			<!-- TODO: do it later on-->
-		    <!-- Sezione Note Pubbliche (Vettore Stored XSS obbligatorio per l'esame) -->
-		    <div class="feedback-section">
-		        <h3>Bacheca Segnalazioni Guasti / Note</h3>
-		        <form id="form-segnalazione">
-		            <textarea id="testo-segnalazione" placeholder="Es: La lavatrice 1 perde acqua..." required></textarea><br>
-		            <button type="submit">Invia Segnalazione</button>
-		        </form>
-		        <div id="segnalazioni-container"></div>
-		    </div>
-		</div>
-
+<!-- *********************************************************************** -->
 		<!--5) Admin -->
 		<div id="view-admin" class="view">
 		    <h2>Pannello di Amministrazione</h2>
 		    <p>Gestione avanzata del sistema. (Vulnerabilità attiva: Broken Access Control)</p>
-		    
 		    <div class="admin-section">
 		        <h3>Gestione Utenti Registrati</h3>
 		        <div class="table-responsive" id="admin-users-container">
@@ -128,7 +166,10 @@
 		<div id="view-profile" class="view">
 		    <h2>Le Tue Prenotazioni</h2>
 		    <div id="my-sessions-container" class="cards-container">
-		        </div>
+		    </div>
+			<h2>Le Tue segnalazioni</h2>
+			<div id="my-notes-container" class="cards-container">
+			</div>
 		</div>
 		
 		<div id="modal-edit-session">
@@ -138,7 +179,6 @@
 		            <input type="hidden" id="edit-session-id">
 		            <input type="hidden" id="edit-started-at"> <label>Nuova Data e Ora di Fine:</label>
 		            <input type="datetime-local" id="edit-ended-at" required>
-		
 		            <div class="modal-actions">
 		                <button type="submit" class="btn-edit-confirm">Aggiorna</button>
 		                <button type="button" class="btn-cancel" onclick="closeEditSession()">Annulla</button>
@@ -146,8 +186,31 @@
 		        </form>
 		    </div>
 		</div>
+		<!-- Puoi metterlo prima di main -->
+		<div id="modal-feedback" class="modal-overlay">
+			<div class="modal-content">
+				<div class="modal-header">
+					<div class="modal-machine-preview">
+						<div class="modal-machine-info">
+							<span class="modal-machine-label">Segnalazione Guasto</span>
+							<h3 id="modal-feedback-machine-name">—</h3>
+						</div>
+					</div>
+					<button type="button" class="btn-modal-close" id="btn-close-feedback">✕</button>
+				</div>
+				<form id="form-feedback" autocomplete="off">
+					<input type="hidden" name="machine_id" id="modal-feedback-machine-id">
+					
+					<div class="form-group">
+						<label for="feedback-content">Descrizione del problema</label>
+						<textarea id="feedback-content" name="content" placeholder="Es: Perde acqua dall'oblò, non si accende..." required rows="4"></textarea>
+					</div>
+					
+					<button type="submit" class="btn-primary btn-full bg-red">Invia Segnalazione</button>
+				</form>
+			</div>
+		</div>
 		</main>
-
 		<footer>
 			This is a small project created by <a href="https://alessiotucci.com">Alessio Tucci</a>
 			as part of the course <a href="https://www.didattica-cps.unito.it/do/corsi.pl/Show?_id=aj9k">
@@ -155,5 +218,4 @@
 		</footer>
 	</body>
  </html>
-
  <!-- SINGLE PAGE APPLICATION -->

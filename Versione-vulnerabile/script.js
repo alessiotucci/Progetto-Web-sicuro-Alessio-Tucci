@@ -4,7 +4,7 @@ import { loadDashboardView, startDashboardPolling, stopDashboardPolling } from '
 import { initBookingForm, openBooking, closeBooking } from './booking.js';
 import { loadAdminView, toggleUserRole, deleteUser } from './admin.js';
 import { loadProfileView, handleEditSession } from './profile.js';
-import { loadFeedback, initFeedbackForm } from './feedback.js';
+import { loadFeedback, initFeedbackForm, openFeedback } from './feedback.js';
 
 const routes = {
     '/': 'view-home',
@@ -30,6 +30,18 @@ function router()
 	{
         viewToShow.classList.add('active');
     }
+	
+	/* Navbar nice :) */
+	document.querySelectorAll('.nav-link').forEach(link => {
+		if (link.getAttribute('href') === path)
+		{
+			link.classList.add('active');
+		}
+		else
+		{
+			link.classList.remove('active');
+		}
+	});
 
     // Esegui fetch specifiche in base alla vista caricata
     if (path === '/dashboard')
@@ -87,6 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const machineId = btn.closest('.card').id.replace('mach-', '');
             openBooking(machineId);
         }
+		// Gestione Segnalazione
+		const btnReport = e.target.closest('.btn-report');
+		if (btnReport) {
+			const machineId = btnReport.closest('.card').id.replace('mach-', '');
+			openFeedback(machineId);
+		}
     });
     
     document.querySelector('#modal-booking button[type="button"]').addEventListener('click', closeBooking);
@@ -95,6 +113,16 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('popstate', router);
     router();
     updateNavbar();
+
+	// ?. Inizializza l'orologio prima di tutto!
+    const clockDisplay = document.getElementById('clock-display');
+    if (clockDisplay) {
+        setInterval(() => {
+            const now = new Date();
+            // Format to HH:MM:SS
+            clockDisplay.textContent = now.toLocaleTimeString('it-IT');
+        }, 1000);
+    }
 
 	// 5. Provo a piazzarlo qui ...
 	const formEditSession = document.getElementById('form-edit-session');

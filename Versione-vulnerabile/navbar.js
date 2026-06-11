@@ -2,6 +2,7 @@
 export function updateNavbar()
 {
     const userJson = localStorage.getItem('user');
+	const homeLink = document.querySelector('a[href="/"]');
     const authLink = document.getElementById('nav-auth');
     const profileLink = document.getElementById('nav-profile');
     const adminLink = document.getElementById('nav-admin');
@@ -12,6 +13,11 @@ export function updateNavbar()
         // UTENTE LOGGATO
         const user = JSON.parse(userJson);
 
+		if (homeLink)
+		{
+			console.log("DEBUG LOG: hiding the home link");
+			homeLink.style.display = 'none';
+		}
         authLink.textContent = 'Logout';
 		authLink.setAttribute('href', '#');
 		authLink.classList.add('logout-action');
