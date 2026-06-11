@@ -172,16 +172,43 @@
 			</div>
 		</div>
 		
-		<div id="modal-edit-session">
+		<div id="modal-edit-session" class="modal-overlay">
 			<div class="modal-content">
-				<h3>Modifica Orario <span id="edit-machine-name"></span></h3>
-				<form id="form-edit-session">
+				<div class="modal-header">
+					<h3>Modifica Orario <span id="edit-machine-name"></span></h3>
+					<button type="button" class="btn-modal-close" onclick="closeEditSession()">✕</button>
+				</div>
+				<form id="form-edit-session" autocomplete="off">
 					<input type="hidden" id="edit-session-id">
-					<input type="hidden" id="edit-started-at"> <label>Nuova Data e Ora di Fine:</label>
-					<input type="datetime-local" id="edit-ended-at" required>
-					<div class="modal-actions">
-						<button type="submit" class="btn-edit-confirm">Aggiorna</button>
-						<button type="button" class="btn-cancel" onclick="closeEditSession()">Annulla</button>
+					<input type="hidden" id="edit-started-at">
+					<input type="hidden" id="edit-ended-at">
+		
+					<div class="booking-time-display">
+						<div class="time-slot">
+							<span class="time-label">Inizio</span>
+							<span class="time-value" id="edit-display-start-time">--:--</span>
+						</div>
+						<div class="time-arrow">→</div>
+						<div class="time-slot">
+							<span class="time-label">Fine</span>
+							<span class="time-value" id="edit-display-end-time">--:--</span>
+						</div>
+					</div>
+		
+					<div class="duration-picker">
+						<p class="duration-label">Nuova Durata</p>
+						<div class="duration-buttons" id="edit-duration-buttons">
+							<button type="button" class="btn-duration" data-minutes="30">30 min</button>
+							<button type="button" class="btn-duration active" data-minutes="60">1 h</button>
+							<button type="button" class="btn-duration" data-minutes="90">1.5 h</button>
+							<button type="button" class="btn-duration" data-minutes="120">2 h</button>
+							<button type="button" class="btn-duration" data-minutes="180">3 h</button>
+						</div>
+					</div>
+		
+					<div class="modal-actions" style="flex-direction: column; gap: 8px;">
+						<button type="submit" class="btn-primary btn-full">Aggiorna Prenotazione</button>
+						<button type="button" class="btn-cancel" onclick="closeEditSession()">Annulla Modifica</button>
 					</div>
 				</form>
 			</div>

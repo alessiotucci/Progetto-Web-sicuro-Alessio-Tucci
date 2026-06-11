@@ -413,34 +413,63 @@ textarea:focus {
 /* =============================================================================
    PROFILE CARDS
    ============================================================================= */
-.profile-card {
+   .profile-card {
     border-top: 4px solid var(--color-success);
     text-align: left;
+    display: flex;
+    flex-direction: column; /* Permette a margin-top: auto di spingere i bottoni in basso */
 }
 
 .card-actions {
     display: flex;
-    gap: var(--space-sm);
-    margin-top: var(--space-sm);
+    flex-direction: column; /* Impila i bottoni in verticale per ospitare testi lunghi */
+    gap: 8px;
+    margin-top: auto; 
+    padding-top: var(--space-md);
 }
 
 .card-actions button {
-    flex: 1;
-    padding: var(--space-sm);
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     cursor: pointer;
     font-weight: 600;
-    color: #fff;
-    transition: opacity 0.15s ease;
+    font-size: 0.9rem;
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.card-actions button:hover { opacity: 0.85; }
+/* ── Bottone Modifica (Replica l'estetica di btn-book) ── */
+.btn-edit {
+    background-color: var(--color-brand);
+    color: #fff !important;
+}
 
-.btn-edit   { background-color: #D97706; color: #000 !important; }
-.btn-delete { background-color: var(--color-danger); }
-.btn-cancel { background-color: var(--color-text-muted) !important; }
+.btn-edit:hover {
+    background-color: var(--color-brand-dark);
+}
 
+/* ── Bottone Cancella (Replica l'estetica di btn-report) ── */
+.btn-delete {
+    background-color: transparent;
+    color: var(--color-danger);
+    text-decoration: underline;
+}
+
+.btn-delete:hover {
+    background-color: var(--color-danger);
+    color: #fff;
+    text-decoration: none;
+}
+
+/* ── Bottone Annulla nei form modali ── */
+.btn-cancel {
+    background-color: var(--color-border) !important;
+    color: var(--color-text) !important;
+}
+.btn-cancel:hover {
+    background-color: #cbd5e1 !important; /* grigio leggermente più scuro */
+}
 /* =============================================================================
    AUTH CARDS (Login / Sign Up)
    ============================================================================= */
@@ -803,4 +832,21 @@ footer a:hover { text-decoration: underline; }
 	color: --color-text;
     box-shadow: var(--md-shadow);
     letter-spacing: 1px;
+}
+
+.btn-cancel {
+    background-color: transparent !important;
+    color: var(--color-text-muted) !important;
+    text-decoration: underline;
+    font-size: 0.85rem;
+    padding: var(--space-sm);
+    border: none;
+    width: 100%;
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    color: var(--color-danger) !important;
+    background-color: transparent !important;
+    text-decoration: none;
 }

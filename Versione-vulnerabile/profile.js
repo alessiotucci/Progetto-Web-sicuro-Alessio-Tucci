@@ -102,19 +102,47 @@ export async function deleteSession(sessionId) {
     }
 }
 
+let editStartTime = null;
+let editDurationMinutes = 60;
+
+function updateEditTimeDisplay() {
+    if (!editStartTime) return;
+    const endTime = new Date(editStartTime.getTime() + editDurationMinutes * 60 * 1000);
+    
+    const toTime = d => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const pad = n => String(n).padStart(2, '0');
+    const toBackend = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+    document.getElementById('edit-display-start-time').textContent = toTime(editStartTime);
+    document.getElementById('edit-display-end-time').textContent = toTime(endTime);
+    document.getElementById('edit-ended-at').value = toBackend(endTime);
+}
+
 export function openEditSession(sessionId, machineName, startedAt, endedAt) {
     document.getElementById('edit-session-id').value = sessionId;
     document.getElementById('edit-started-at').value = startedAt; 
     document.getElementById('edit-machine-name').textContent = machineName;
 
-    // Converte la data dal DB in un formato accettato dall'input datetime-local (YYYY-MM-DDThh:mm)
-    if (endedAt && endedAt !== 'null') {
-        const d = new Date(endedAt);
-        const tzOffset = d.getTimezoneOffset() * 60000;
-        const localISOTime = (new Date(d - tzOffset)).toISOString().slice(0, 16);
-        document.getElementById('edit-ended-at').value = localISOTime;
-    }
+    // Imposta il calcolo basandosi sulla partenza originale
+    editStartTime = new Date(startedAt);
+    const endTime = new Date(endedAt);
+    
+    // Calcola i minuti correnti e attiva il bottone corrispondente
+    editDurationMinutes = Math.round((endTime - editStartTime) / 60000);
+    if (editDurationMinutes <= 0) editDurationMinutes = 60; 
 
+    document.querySelectorAll('#edit-duration-buttons .btn-duration').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.minutes) === editDurationMinutes);
+        // Aggiungi event listener dinamico per i bottoni durata
+        btn.onclick = () => {
+            document.querySelectorAll('#edit-duration-buttons .btn-duration').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            editDurationMinutes = parseInt(btn.dataset.minutes);
+            updateEditTimeDisplay();
+        };
+    });
+
+    updateEditTimeDisplay();
     document.getElementById('modal-edit-session').classList.add('active');
 }
 

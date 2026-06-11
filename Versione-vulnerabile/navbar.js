@@ -41,10 +41,9 @@ export function updateNavbar()
         authLink.textContent = 'Login';
         authLink.setAttribute('href', '/login');
 		authLink.classList.remove('logout-action'); // Rimuove il marcatore
-		
         profileLink.textContent = 'Sign Up';
         profileLink.setAttribute('href', '/signup');
-
+		homeLink.style.display = 'inline-flex';
         if (adminLink)
 		{
             adminLink.style.display = 'none';

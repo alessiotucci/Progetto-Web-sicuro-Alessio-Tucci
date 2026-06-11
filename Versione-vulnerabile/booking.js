@@ -100,12 +100,13 @@ export function openBooking(machineId)
     document.getElementById('modal-booking').classList.add('active');
     document.body.style.overflow = 'hidden'; // prevent background scroll while modal is open
 }
-
-export function closeBooking() {
+/* CloseBooking */
+export function closeBooking()
+{
+	console.log("DEBUG LOG: Close booking function!");
     document.getElementById('modal-booking').classList.remove('active');
     document.getElementById('form-booking').reset();
     document.body.style.overflow = '';
-
     // Remove selection highlight when user cancels
     document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
 }
@@ -147,10 +148,14 @@ export function initBookingForm() {
             });
             const result = await res.json();
 
-            if (result.success) {
+            //if (result.success)
+			if (res.ok)
+			{
                 closeBooking();
                 loadDashboardView(); // refresh card statuses without resetting the poll interval
-            } else {
+            }
+			else
+			{
                 alert(`Booking failed: ${result.message || result.error}`);
             }
         } catch (err) {
