@@ -65,13 +65,12 @@ def update_note(note_id):
     data = request.get_json()
 
     #TODO: no auth service, no check admin role, no cleaning input
-    machine_id = data.get('machine_id')
-    content = date.get('content')
+    content = data.get('content')
     # created at ???
 
     db.execute(
-            "UPDATE notes SET machine_id = ?, content = ? WHERE id = ?",
-            (machine_id, content, note_id)
+            "UPDATE notes SET content = ? WHERE id = ?",
+            (content, note_id)
             )
     db.commit()
 
