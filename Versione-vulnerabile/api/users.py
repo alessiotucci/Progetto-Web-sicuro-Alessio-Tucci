@@ -57,13 +57,20 @@ def update_users(user_id):
     data = request.get_json()
 
     #TODO: no auth service, no check admin role, no cleaning input
-    username = data['username']
-    password = data['password']
+#    username = data['username']
+#    password = data['password']
+#
+#    db.execute(
+#            "UPDATE users SET username = ?, password = ? WHERE id = ?",
+#            (username, password, user_id)
+#            )
 
+    role = data['role']
     db.execute(
-            "UPDATE users SET username = ?, password = ? WHERE id = ?",
-            (username, password, user_id)
+            "UPDATE users SET role = ? WHERE id = ?",
+            (role, user_id)
             )
+
     db.commit()
 
     return jsonify({'message': 'User updated'}), 200

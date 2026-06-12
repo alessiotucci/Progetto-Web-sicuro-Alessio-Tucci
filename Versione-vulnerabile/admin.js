@@ -23,7 +23,8 @@ function formatAdminDate(dateStr) {
     return new Date(dateStr).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' });
 }
 
-export async function loadAdminView() {
+export async function loadAdminView()
+{
     const userJson = localStorage.getItem('user');
     if (!userJson) {
         alert("Accesso negato. Effettua il login.");
@@ -37,8 +38,11 @@ export async function loadAdminView() {
     }
 
     try {
+        // Cache-busting param
+        const t = Date.now();
+
         // --- 1. POPOLA TABELLA UTENTI ---
-        const usersRes = await fetch('/api/users'); // Assicurati che l'endpoint esista (GET)
+        const usersRes = await fetch(`/api/users?t=${t}`); 
         const usersData = await usersRes.json();
         const usersContainer = document.getElementById('admin-users-container');
 
@@ -72,7 +76,7 @@ export async function loadAdminView() {
         }
 
         // --- 2. POPOLA TABELLA SESSIONI ---
-        const sessionsRes = await fetch('/api/sessions/');
+        const sessionsRes = await fetch(`/api/sessions/?t=${t}`);
         const sessionsData = await sessionsRes.json();
         const sessionsContainer = document.getElementById('admin-sessions-container');
 
@@ -88,7 +92,6 @@ export async function loadAdminView() {
                     <tbody>
             `;
             sessions.forEach(s => {
-                // Sfruttiamo le stesse funzioni del profilo per Modifica/Elimina
                 html += `
                     <tr>
                         <td>${s.id}</td>
@@ -98,7 +101,7 @@ export async function loadAdminView() {
                         <td>${formatAdminDate(s.ended_at)}</td>
                         <td class="action-btns">
                             <button class="btn-small bg-blue" onclick="openEditSession(${s.id}, '${s.machine_name}', '${s.started_at}', '${s.ended_at}')">Modifica</button>
-                            <button class="btn-small bg-red" onclick="deleteSession(${s.id}, true)">Elimina</button>
+                            <button class="btn-small bg-red" onclick="deleteSession(${s.id})">Elimina</button>
                         </td>
                     </tr>
                 `;
@@ -106,9 +109,42 @@ export async function loadAdminView() {
             html += '</tbody></table>';
             sessionsContainer.innerHTML = html;
         }
+
+        // --- 3. POPOLA TABELLA SEGNALAZIONI (NOTE) ---
+        const notesRes = await fetch(`/api/notes?t=${t}`);
+        const notes = await notesRes.json();
+        const notesContainer = document.getElementById('admin-notes-container');
+
+        if (Array.isArray(notes)) {
+            let html = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Utente</th><th>Macchina</th><th>Testo</th><th>Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            notes.forEach(n => {
+                html += `
+                    <tr>
+                        <td>${n.id}</td>
+                        <td>${n.username || n.user_id}</td>
+                        <td><strong>${n.name || n.machine_id}</strong></td>
+                        <td>${n.content}</td>
+                        <td class="action-btns">
+                            <button class="btn-small bg-blue" data-id="${n.id}" data-content="${n.content.replace(/"/g, '&quot;')}" onclick="openEditNote(this)">Modifica</button>
+                            <button class="btn-small bg-red" onclick="deleteNote(${n.id})">Elimina</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            html += '</tbody></table>';
+            notesContainer.innerHTML = html;
+        }
+
     } catch (error) {
         console.error("Errore pannello Admin:", error);
-        document.getElementById('admin-users-container').innerHTML = "<p>Errore di connessione.</p>";
     }
 }
 
@@ -127,9 +163,12 @@ export async function toggleUserRole(userId, currentRole) {
             body: JSON.stringify({ role: newRole })
         });
 
-        if (res.ok) {
+        if (res.ok)
+		{
             loadAdminView(); // Ricarica la tabella
-        } else {
+        }
+		else
+		{
             alert("Errore durante l'aggiornamento del ruolo.");
         }
     } catch (e) {
@@ -137,14 +176,18 @@ export async function toggleUserRole(userId, currentRole) {
     }
 }
 
-export async function deleteUser(userId) {
+export async function deleteUser(userId)
+{
     if (!confirm("ATTENZIONE! Vuoi eliminare definitivamente questo utente?")) return;
 
     try {
         const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
-        if (res.ok) {
+        if (res.ok)
+		{
             loadAdminView();
-        } else {
+        }
+		else
+		{
             alert("Errore durante l'eliminazione dell'utente.");
         }
     } catch (e) {

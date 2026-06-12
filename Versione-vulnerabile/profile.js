@@ -178,13 +178,28 @@ export async function handleEditSession(e) {
 // FUNZIONI CRUD - SEGNALAZIONI
 // ==========================================
 
+// export async function deleteNote(noteId) {
+//     if (!confirm("Sei sicuro di voler cancellare questa segnalazione?")) return;
+
+//     try {
+//         const res = await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
+//         if (res.ok) {
+//             loadProfileView(); 
+//         } else {
+//             alert("Errore durante la cancellazione.");
+//         }
+//     } catch (e) {
+//         console.error("Errore DELETE note", e);
+//     }
+// }
 export async function deleteNote(noteId) {
     if (!confirm("Sei sicuro di voler cancellare questa segnalazione?")) return;
 
     try {
         const res = await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
-        if (res.ok) {
-            loadProfileView(); 
+        if (res.ok)
+		{
+            window.dispatchEvent(new Event('popstate')); // Aggiorna dinamicamente
         } else {
             alert("Errore durante la cancellazione.");
         }
@@ -206,6 +221,28 @@ export function closeEditNote() {
     document.getElementById('modal-edit-note').classList.remove('active');
 }
 
+// export async function handleEditNote(e) {
+//     e.preventDefault();
+//     const noteId = document.getElementById('edit-note-id').value;
+//     const content = document.getElementById('edit-note-content').value;
+
+//     try {
+//         const res = await fetch(`/api/notes/${noteId}`, {
+//             method: 'PUT',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({ content: content })
+//         });
+
+//         if (res.ok) {
+//             closeEditNote();
+//             loadProfileView();
+//         } else {
+//             alert("Errore durante l'aggiornamento.");
+//         }
+//     } catch (error) {
+//         console.error("Errore PUT note", error);
+//     }
+// }
 export async function handleEditNote(e) {
     e.preventDefault();
     const noteId = document.getElementById('edit-note-id').value;
@@ -220,7 +257,7 @@ export async function handleEditNote(e) {
 
         if (res.ok) {
             closeEditNote();
-            loadProfileView();
+            window.dispatchEvent(new Event('popstate')); // Aggiorna dinamicamente
         } else {
             alert("Errore durante l'aggiornamento.");
         }

@@ -151,15 +151,67 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
     });
 
+	/* fix the bug for the signup handling */
     registerFormHandler('form-signup', '/api/users', (result) => {
-        if (result.success || result.user) {
+        if (result.message === 'User created' || result.id)
+		{
             // Adatta il risultato in base a cosa restituisce esattamente il tuo backend
             const user = result.user || { username: 'Nuovo Utente' }; 
             localStorage.setItem('user', JSON.stringify(user));
             updateNavbar();
-            my_navigateTo('/dashboard');
-        } else {
+			alert("Account created, now you can login in");
+			document.getElementById("form-login").reset();
+			goofy_animation();
+            my_navigateTo('/login');
+        }
+		else
+		{
             alert(`Errore Registrazione: ${result.message || result.error}`);
         }
     });
 });
+
+
+function goofy_animation() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .laundry-toast {
+            position: fixed;
+            bottom: var(--space-xl);
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: var(--color-success-light);
+            color: var(--color-success);
+            border: 2px solid var(--color-success);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md) var(--space-lg);
+            font-size: 1.1rem;
+            font-weight: 700;
+            box-shadow: 0 10px 25px rgba(22, 163, 74, 0.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            /* Effetto rimbalzo fluido */
+            animation: laundrySlideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        @keyframes laundrySlideUp {
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    const toast = document.createElement('div');
+    toast.className = 'laundry-toast';
+    // L'icona a bolle richiama il tema della lavanderia
+    toast.innerHTML = '<span style="font-size: 1.5rem;">🫧</span> Account creato!';
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+        setTimeout(() => { toast.remove(); style.remove(); }, 300);
+    }, 2500);
+}
