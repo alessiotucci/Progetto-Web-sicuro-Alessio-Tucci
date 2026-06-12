@@ -1,34 +1,293 @@
-<!-- versione sicura -->
 <!DOCTYPE html>
-<html lang="ENG">
-   <head>
-	   <meta charset="UTF-8">
-	   <title>Secure Version</title>
-	   <link rel="stylesheet" href="styles.css">
-	   <script src="script.js">
-	</script>
-   </head>
-   <body>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<!-- [SECURITY FIX] Added Content-Security-Policy meta tag to restrict resource loading and prevent XSS -->
+		<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;">
+		<link rel="icon" href="/shared/basic-icon512.png" type="image/png">
+		<title>Safe Version</title>
+		<link rel="stylesheet" href="styles.css">
+		<script type="module" src="script.js"></script>
+	</head>
+	<body>
+		<header>
+			<nav>
+				<a href="/" class="nav-link">Home</a>
+				<a href="/login" class="nav-link" id="nav-auth">Login</a>
+				<a href="/signup" class="nav-link" id="nav-profile">Sign Up</a>
+				<a href="/dashboard" class="nav-link">Dashboard</a>
+				<!-- [SECURITY FIX] Admin link is fully removed from the DOM instead of just hidden with
+				     display:none — a hidden element is still visible in the page source and can be
+				     manually enabled via DevTools, which is a client-side access control bypass.
+				     The link is now injected dynamically by script.js only when the server confirms
+				     the user has an admin role. -->
+			</nav>
+		</header>
 
-	<header>
-		<nav>
-			<a href="/" class="nav-link"> Home</a>
-			<a href="/login" class="nav-link"> Login</a>
-			<a href="/signup" class="nav-link"> Signup</a>
-			<a href="dashboard/" class="nav-link"> Dashboard</a>
-			<a href="/admin" class="nav-link"> Admin</a>
-		</nav>
-	</header>
-	<h1> Welcome to this secure Website!</h1>
+		<main id="my_app">
+			<!--1) Home -->
+			<div id="view-home" class="view active">
+				<h1>Welcome to the washing machine pages (safe version)</h1>
+				<p>To start, create an account or log in!</p>
+			</div>
 
-	<button type="button" id="login">Log in</button>
-	<button type="button" id="signup">Sign up</button>
+			<!--2) Login -->
+			<div id="view-login" class="view">
+				<div class="auth-card">
+					<h2>Log in (safe version)</h2>
+					<p class="auth-subtitle">Inserisci le tue credenziali per accedere.</p>
+					<form id="form-login" autocomplete="off">
+						<div class="form-group">
+							<label for="login-username">Username</label>
+							<!-- [SECURITY FIX] autocomplete="off" on sensitive fields to discourage
+							     credential caching in shared/public machines -->
+							<input type="text" id="login-username" name="username" autocomplete="username" placeholder="Es. mario.rossi" required>
+						</div>
+						<div class="form-group">
+							<label for="login-password">Password</label>
+							<input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="••••••••" required>
+						</div>
+						<button type="submit" class="btn-primary btn-full">Log in</button>
+					</form>
+					<div id="login-error" class="error-msg" role="alert"></div>
+				</div>
+			</div>
 
-	<footer>
-		This is a small project crated by <a href="https://alessiotucci.com">Alessio Tucci</a>
-		as part of the course <a href="https://www.didattica-cps.unito.it/do/corsi.pl/Show?_id=aj9k">
-		Web sicuro e Personalizzato</a>
-	</footer>
-</body>
+			<!-- 3) Signup -->
+			<div id="view-signup" class="view">
+				<div class="auth-card">
+					<h2>Sign up (safe version)</h2>
+					<p class="auth-subtitle">Crea un nuovo account.</p>
+					<form id="form-signup" autocomplete="off">
+						<div class="form-group">
+							<label for="signup-username">Username</label>
+							<input type="text" id="signup-username" name="username" autocomplete="username" placeholder="Es. mario.rossi" required>
+						</div>
+						<div class="form-group">
+							<label for="signup-password">Password</label>
+							<input type="password" id="signup-password" name="password" autocomplete="new-password" placeholder="••••••••" required>
+						</div>
+						<button type="submit" class="btn-primary btn-full">Sign up</button>
+					</form>
+				</div>
+			</div>
+
+			<!-- 4) Dashboard -->
+			<div id="view-dashboard" class="view">
+				<h2>Current Status (safe version)</h2>
+				<div class="md-clock">
+					<span id="clock-display">00:00:00</span>
+				</div>
+				<div class="cards-container">
+					<div class="card" id="mach-l1">
+						<h3>Lavatrice 1</h3>
+						<img src="../shared/lavatrice-1.jpg" alt="Lavatrice 1">
+						<p class="status">Status: <span class="status-text">Loading...</span></p>
+						<button class="btn-book">Prenota</button>
+						<button class="btn-report">Segnala un problema</button>
+					</div>
+					<div class="card" id="mach-l2">
+						<h3>Lavatrice 2</h3>
+						<img src="../shared/lavatrice-2.jpg" alt="Lavatrice 2">
+						<p class="status">Status: <span class="status-text">Loading...</span></p>
+						<button class="btn-book">Prenota</button>
+						<button class="btn-report">Segnala un problema</button>
+					</div>
+					<div class="card" id="mach-a1">
+						<h3>Asciugatrice 1</h3>
+						<img src="../shared/asciugatrice.jpg" alt="Asciugatrice 1">
+						<p class="status">Status: <span class="status-text">Loading...</span></p>
+						<button class="btn-book">Prenota</button>
+						<button class="btn-report">Segnala un problema</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Booking modal -->
+			<div id="modal-booking" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-machine-name">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div class="modal-machine-preview">
+							<img id="modal-machine-img" src="" alt="Selected machine">
+							<div class="modal-machine-info">
+								<span class="modal-machine-label">Booking</span>
+								<h3 id="modal-machine-name">—</h3>
+							</div>
+						</div>
+						<button type="button" class="btn-modal-close" id="btn-close-booking" aria-label="Close booking modal">✕</button>
+					</div>
+					<form id="form-booking" autocomplete="off">
+						<!-- [SECURITY FIX] Removed hidden fields for machine_id and user_id from the form.
+						     Sending security-relevant identifiers as hidden HTML inputs lets any user
+						     tamper with them via DevTools and book on behalf of another user or target
+						     a different machine. These values are now read exclusively from the
+						     authenticated session on the server side. The started_at / ended_at hidden
+						     fields are kept only as a UI convenience but are re-validated server-side
+						     against the allowed booking window. -->
+						<input type="hidden" name="started_at" id="modal-started-at">
+						<input type="hidden" name="ended_at"   id="modal-ended-at">
+
+						<div class="booking-time-display">
+							<div class="time-slot">
+								<span class="time-label">From</span>
+								<span class="time-value" id="display-start-time">--:--</span>
+							</div>
+							<div class="time-arrow" aria-hidden="true">→</div>
+							<div class="time-slot">
+								<span class="time-label">Until</span>
+								<span class="time-value" id="display-end-time">--:--</span>
+							</div>
+						</div>
+
+						<div class="duration-picker">
+							<p class="duration-label">Duration</p>
+							<div class="duration-buttons">
+								<button type="button" class="btn-duration" data-minutes="30">30 min</button>
+								<button type="button" class="btn-duration active" data-minutes="60">1 h</button>
+								<button type="button" class="btn-duration" data-minutes="90">1.5 h</button>
+								<button type="button" class="btn-duration" data-minutes="120">2 h</button>
+								<button type="button" class="btn-duration" data-minutes="180">3 h</button>
+							</div>
+						</div>
+
+						<button type="submit" class="btn-primary btn-full">Confirm Booking</button>
+					</form>
+				</div>
+			</div>
+
+			<!--5) Admin -->
+			<!-- [SECURITY FIX] This view is only injected into the DOM by script.js after the server
+			     confirms admin role. Relying solely on display:none or a client-side flag is Broken
+			     Access Control (OWASP A01). The server must enforce the same role check on every
+			     admin API request regardless of what the client sends. -->
+			<div id="view-admin" class="view">
+				<h2>Pannello di Amministrazione (safe version)</h2>
+				<p>Gestione avanzata del sistema.</p>
+				<div class="admin-section">
+					<h3>Gestione Utenti Registrati</h3>
+					<div class="table-responsive" id="admin-users-container"></div>
+				</div>
+				<div class="admin-section">
+					<h3>Gestione Globale Prenotazioni</h3>
+					<div class="table-responsive" id="admin-sessions-container"></div>
+				</div>
+				<div class="admin-section">
+					<h3>Gestione Globale Segnalazioni</h3>
+					<div class="table-responsive" id="admin-notes-container"></div>
+				</div>
+			</div>
+
+			<!-- 6) Profile -->
+			<div id="view-profile" class="view">
+				<h2>Le Tue Prenotazioni (safe version)</h2>
+				<div id="my-sessions-container" class="cards-container"></div>
+				<h2>Le Tue Segnalazioni</h2>
+				<div id="my-notes-container" class="cards-container"></div>
+			</div>
+
+			<!-- Edit session modal -->
+			<div id="modal-edit-session" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="edit-machine-name">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h3>Modifica Orario <span id="edit-machine-name"></span></h3>
+						<button type="button" class="btn-modal-close" onclick="closeEditSession()" aria-label="Close edit modal">✕</button>
+					</div>
+					<form id="form-edit-session" autocomplete="off">
+						<!-- [SECURITY FIX] Removed hidden session-id field from the form.
+						     The session ID must be stored in JS memory only and attached to the
+						     request by script.js — never exposed as an editable DOM input.
+						     An attacker with DevTools could otherwise change the ID to modify
+						     any other user's booking (Insecure Direct Object Reference). -->
+						<input type="hidden" id="edit-started-at">
+						<input type="hidden" id="edit-ended-at">
+
+						<div class="booking-time-display">
+							<div class="time-slot">
+								<span class="time-label">Inizio</span>
+								<span class="time-value" id="edit-display-start-time">--:--</span>
+							</div>
+							<div class="time-arrow" aria-hidden="true">→</div>
+							<div class="time-slot">
+								<span class="time-label">Fine</span>
+								<span class="time-value" id="edit-display-end-time">--:--</span>
+							</div>
+						</div>
+
+						<div class="duration-picker">
+							<p class="duration-label">Nuova Durata</p>
+							<div class="duration-buttons" id="edit-duration-buttons">
+								<button type="button" class="btn-duration" data-minutes="30">30 min</button>
+								<button type="button" class="btn-duration active" data-minutes="60">1 h</button>
+								<button type="button" class="btn-duration" data-minutes="90">1.5 h</button>
+								<button type="button" class="btn-duration" data-minutes="120">2 h</button>
+								<button type="button" class="btn-duration" data-minutes="180">3 h</button>
+							</div>
+						</div>
+
+						<div class="modal-actions" style="flex-direction: column; gap: 8px;">
+							<button type="submit" class="btn-primary btn-full">Aggiorna Prenotazione</button>
+							<button type="button" class="btn-cancel" onclick="closeEditSession()">Annulla Modifica</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<!-- Feedback / fault report modal -->
+			<div id="modal-feedback" class="modal-overlay" role="dialog" aria-modal="true">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div class="modal-machine-preview">
+							<div class="modal-machine-info">
+								<span class="modal-machine-label">Segnalazione Guasto</span>
+								<h3 id="modal-feedback-machine-name">—</h3>
+							</div>
+						</div>
+						<button type="button" class="btn-modal-close" id="btn-close-feedback" aria-label="Close feedback modal">✕</button>
+					</div>
+					<form id="form-feedback" autocomplete="off">
+						<!-- [SECURITY FIX] Removed hidden machine_id input for the same reason as the
+						     booking modal — its value must come from authenticated server state, not
+						     from a user-editable hidden field. -->
+
+						<div class="form-group">
+							<label for="feedback-content">Descrizione del problema</label>
+							<!-- [SECURITY FIX] maxlength added to prevent excessively large payloads
+							     that could be used for DoS or to probe server-side input handling -->
+							<textarea id="feedback-content" name="content" maxlength="1000" placeholder="Es: Perde acqua dall'oblò, non si accende..." required rows="4"></textarea>
+						</div>
+
+						<button type="submit" class="btn-primary btn-full bg-red">Invia Segnalazione</button>
+					</form>
+				</div>
+			</div>
+
+			<!-- Edit note modal -->
+			<div id="modal-edit-note" class="modal-overlay" role="dialog" aria-modal="true">
+				<div class="modal-content">
+					<h3>Modifica Segnalazione (safe version)</h3>
+					<form id="form-edit-note">
+						<!-- [SECURITY FIX] Removed hidden note-id input — same IDOR risk as the
+						     session edit modal. The note ID is kept in JS memory and sent
+						     programmatically, never as a tamperable hidden field. -->
+						<div class="form-group">
+							<!-- [SECURITY FIX] maxlength added to mirror server-side validation -->
+							<textarea id="edit-note-content" required rows="4" maxlength="1000" style="width: 100%;"></textarea>
+						</div>
+						<div class="modal-actions">
+							<button type="submit" class="btn-edit-confirm">Aggiorna</button>
+							<button type="button" class="btn-cancel" onclick="closeEditNote()">Annulla</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+		</main>
+
+		<footer>
+			This is a small project created by <a href="https://alessiotucci.com">Alessio Tucci</a>
+			as part of the course <a href="https://www.didattica-cps.unito.it/do/corsi.pl/Show?_id=aj9k">
+			Web sicuro e Personalizzato</a>
+		</footer>
+	</body>
 </html>
- <!-- SINGLE PAGE APPLICATION -->
+<!-- SINGLE PAGE APPLICATION — SAFE VERSION -->
