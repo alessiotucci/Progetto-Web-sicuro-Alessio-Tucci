@@ -85,8 +85,7 @@ export function openBooking(machineId)
     document.getElementById('modal-user-id').value    = user.id;
 
     // ── 4. Set sensible time defaults ─────────────────────────────────────────
-    //startTime = roundUpTo15(new Date()); // start = now, rounded to next :00/:15/:30/:45
-    startTime = new Date(); // start = now, rounded to next :00/:15/:30/:45
+    startTime = new Date();
     selectedDurationMinutes = 60;
 
     // Reset duration button highlight to the default (1h)
@@ -148,7 +147,6 @@ export function initBookingForm() {
             });
             const result = await res.json();
 
-            //if (result.success)
 			if (res.ok)
 			{
                 closeBooking();
