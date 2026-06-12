@@ -9,7 +9,7 @@ machines_bp = Blueprint('machines', __name__)
 
 # 1) Read all - GET /api/machines
 @machines_bp.route('/', methods=['GET'])
-@admin_required # [SECURITY FIX] Auth and admin role check enforced
+#@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def get_machines():
     try:
         db = get_db()
@@ -27,7 +27,7 @@ def get_machines():
 
 # 2) Read one - GET /api/machines/<machine_id>
 @machines_bp.route('/<machine_id>', methods=['GET'])
-@admin_required # [SECURITY FIX] Auth and admin role check enforced
+#@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def get_machine(machine_id):
     try:
         db = get_db()

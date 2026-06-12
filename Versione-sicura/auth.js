@@ -1,6 +1,8 @@
 // Secure version of auth.js
 // Versione-sicura/auth.js
 
+
+
 export function registerFormHandler(formId, endpoint, callback)
 {
     const form = document.getElementById(formId);

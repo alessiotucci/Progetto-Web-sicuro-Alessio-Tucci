@@ -214,22 +214,22 @@
 						</div>
 
 						<div class="duration-picker">
-							<p class="duration-label">Nuova Durata</p>
-							<div class="duration-buttons" id="edit-duration-buttons">
-								<button type="button" class="btn-duration" data-minutes="30">30 min</button>
-								<button type="button" class="btn-duration active" data-minutes="60">1 h</button>
-								<button type="button" class="btn-duration" data-minutes="90">1.5 h</button>
-								<button type="button" class="btn-duration" data-minutes="120">2 h</button>
-								<button type="button" class="btn-duration" data-minutes="180">3 h</button>
-							</div>
-						</div>
+                            <p class="duration-label">Nuova Durata</p>
+                            <div class="duration-buttons" id="edit-duration-buttons">
+                                <button type="button" class="btn-duration" data-minutes="30">30 min</button>
+                                <button type="button" class="btn-duration active" data-minutes="60">1 h</button>
+                                <button type="button" class="btn-duration" data-minutes="90">1.5 h</button>
+                                <button type="button" class="btn-duration" data-minutes="120">2 h</button>
+                                <button type="button" class="btn-duration" data-minutes="180">3 h</button>
+                            </div>
+                        </div>
 
-						<div class="modal-actions" style="flex-direction: column; gap: 8px;">
-							<button type="submit" class="btn-primary btn-full">Aggiorna Prenotazione</button>
-							<button type="button" class="btn-cancel" onclick="closeEditSession()">Annulla Modifica</button>
-						</div>
-					</form>
-				</div>
+                        <div class="modal-actions column-layout">
+                            <button type="submit" class="btn-primary btn-full">Aggiorna Prenotazione</button>
+                            <button type="button" class="btn-cancel" id="btn-close-edit-session">Annulla Modifica</button>
+                        </div>
+                    </form>
+                </div>
 			</div>
 
 			<!-- Feedback / fault report modal -->
@@ -271,12 +271,10 @@
 						     programmatically, never as a tamperable hidden field. -->
 						<div class="form-group">
 							<!-- [SECURITY FIX] maxlength added to mirror server-side validation -->
-							<textarea id="edit-note-content" required rows="4" maxlength="1000" style="width: 100%;"></textarea>
-						</div>
+							<textarea id="edit-note-content" class="w-100" required rows="4" maxlength="1000"></textarea>						</div>
 						<div class="modal-actions">
 							<button type="submit" class="btn-edit-confirm">Aggiorna</button>
-							<button type="button" class="btn-cancel" onclick="closeEditNote()">Annulla</button>
-						</div>
+							<button type="button" class="btn-cancel" id="btn-close-edit-note">Annulla</button>						</div>
 					</form>
 				</div>
 			</div>

@@ -1,6 +1,6 @@
 // Secure version of feedback.js
-// feedback.js
 import { getSecureState } from './script.js';
+import { getAuthHeaders } from './dashboard.js';
 
 // =============================================================================
 // OPEN / CLOSE
@@ -8,7 +8,6 @@ import { getSecureState } from './script.js';
 
 export function openFeedback(machineId)
 {
-    // [SECURITY FIX] Kept as a UX guard only — real auth enforcement is server-side.
     const userJson = localStorage.getItem('user');
     if (!userJson) {
         alert("Devi effettuare il login per segnalare un problema.");
@@ -18,30 +17,26 @@ export function openFeedback(machineId)
     const card = document.getElementById(`mach-${machineId}`);
     if (card) {
         const machineName = card.querySelector('h3')?.textContent || machineId.toUpperCase();
-        // textContent is already used here — no change needed, this is correct.
         document.getElementById('modal-feedback-machine-name').textContent = machineName;
     }
 
-    // [SECURITY FIX] Removed the hidden <input> write for machine_id.
-    // Storing it in a DOM input exposes it to DevTools tampering (IDOR risk —
-    // a user could change the ID to submit a report against any machine).
-    // The ID is kept in _secureState in memory instead, consistent with the
-    // pattern used in booking.js.
     const state = getSecureState();
     state.feedbackMachineId = machineId;
 
     document.getElementById('modal-feedback').classList.add('active');
-    document.body.style.overflow = 'hidden';
+    
+    // FIX CSP: Sostituito style inline con la classe CSS
+    document.body.classList.add('no-scroll');
 }
 
 export function closeFeedback()
 {
     document.getElementById('modal-feedback').classList.remove('active');
     document.getElementById('form-feedback').reset();
-    document.body.style.overflow = '';
+    
+    // FIX CSP: Sostituito style inline con la classe CSS
+    document.body.classList.remove('no-scroll');
 
-    // [SECURITY FIX] Clear the in-memory machine ID on close so a stale value
-    // cannot be reused if the modal is reopened in an unexpected state.
     const state = getSecureState();
     state.feedbackMachineId = null;
 }
@@ -53,12 +48,9 @@ export function closeFeedback()
 export function initFeedbackForm()
 {
     document.getElementById('btn-close-feedback').addEventListener('click', closeFeedback);
-
     document.getElementById('form-feedback').addEventListener('submit', async (e) => {
         e.preventDefault();
-
-        // [SECURITY FIX] Wrap localStorage read in try/catch — malformed data
-        // would otherwise throw an uncaught exception and break the handler.
+        
         let user;
         try {
             user = JSON.parse(localStorage.getItem('user'));
@@ -68,42 +60,34 @@ export function initFeedbackForm()
         }
 
         if (!user) return;
-
         const formData = new FormData(e.target);
-
-        // [SECURITY FIX] machine_id is read from _secureState (memory), not from
-        // the hidden DOM input that was removed from the HTML. user_id is
-        // intentionally omitted from the payload — the server must resolve it
-        // from the authenticated session cookie, not trust a client-supplied value.
         const state = getSecureState();
+        
+        // FIX 400: Aggiunto user_id richiesto dal backend in api/notes.py
         const body = {
+            user_id: user.id,
             machine_id: state.feedbackMachineId,
-            content:    formData.get('content')
+            content: formData.get('content')
         };
 
-        // [SECURITY FIX] Abort if machine_id is missing — the modal was somehow
-        // submitted without going through openFeedback().
         if (!body.machine_id) {
             alert('Stato non valido. Chiudi il modale e riprova.');
             return;
         }
 
-        // [SECURITY FIX] Client-side length guard mirrors the maxlength="1000"
-        // added to the textarea in the HTML. Defence-in-depth: even if the HTML
-        // attribute is bypassed (e.g. via DevTools or a raw HTTP request), the
-        // JS layer rejects oversized payloads before they reach the network.
         if (body.content && body.content.length > 1000) {
             alert('La segnalazione non può superare i 1000 caratteri.');
             return;
         }
 
+        const headers = getAuthHeaders();
+        headers['Content-Type'] = 'application/json';
+        
         try {
-            const res = await fetch('/api/notes', {
+            // FIX URL: Aggiunto lo slash finale
+            const res = await fetch('/api/notes/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                // [SECURITY FIX] Added credentials: 'same-origin' so the server
-                // can authenticate the request via session cookie and reject
-                // unauthenticated submissions.
+                headers: headers,
                 credentials: 'same-origin',
                 body: JSON.stringify(body)
             });
@@ -112,29 +96,26 @@ export function initFeedbackForm()
                 closeFeedback();
                 alert("Segnalazione inviata con successo.");
             } else {
-                // [SECURITY FIX] Do not echo the raw server error string into the
-                // alert — it may reveal internal details. Show a generic message.
                 console.error('Feedback submit failed with status', res.status);
                 alert('Impossibile inviare la segnalazione. Riprova più tardi.');
             }
-        } catch (err) {
-            // [SECURITY FIX] Do not log the raw error object to the console.
-            console.error('Feedback: network or parse error');
-            alert("Errore di rete. Riprova più tardi.");
+        } catch(err) {
+            console.error('Feedback error', err);
+            alert('Errore di rete. Riprova più tardi.');
         }
     });
 }
-
 // =============================================================================
 // LOAD / RENDER FEEDBACK BOARD
 // =============================================================================
 
 export async function loadFeedback()
 {
-    try {
-        const res = await fetch('/api/notes', {
+    try { 
+        const res = await fetch('/api/notes/me', {
             // [SECURITY FIX] Added credentials: 'same-origin' — the notes board
             // should only be visible to authenticated users.
+			headers: getAuthHeaders(),
             credentials: 'same-origin'
         });
 

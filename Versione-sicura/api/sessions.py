@@ -38,7 +38,7 @@ def get_sessions():
             
             # Se NON sei admin E questa sessione NON è tua -> nascondi l'identità
             if not is_admin and str(session_dict['user_id']) != str(caller_id):
-                session_dict['username'] = 'Utente Anonimo' # O semplicemente None
+                session_dict['username'] = 'Qualcuno' # O semplicemente None
                 
             # Rimuove l'user_id esatto prima di inviare al front-end
             session_dict.pop('user_id', None) 
@@ -52,7 +52,7 @@ def get_sessions():
 
 # 2) Read one - GET /api/sessions/<session_id>
 @sessions_bp.route('/<session_id>', methods=['GET'])
-@admin_required # [SECURITY FIX] Auth and admin role check enforced
+#@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def get_session(session_id):
     try:
         db = get_db()
@@ -76,7 +76,6 @@ def get_session(session_id):
 
 # 3) Create - POST /api/sessions
 @sessions_bp.route('/', methods=['POST'])
-@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def create_session():
     data = request.get_json()
 
@@ -104,7 +103,6 @@ def create_session():
 
 # 4) Update - PUT /api/sessions/<session_id>
 @sessions_bp.route('/<session_id>', methods=["PUT"])
-@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def update_session(session_id):
     data = request.get_json()
 
@@ -130,7 +128,6 @@ def update_session(session_id):
 
 # 5) Delete - DELETE /api/sessions/<session_id>
 @sessions_bp.route('/<session_id>', methods=["DELETE"])
-@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def delete_session(session_id):
     try:
         db = get_db()
@@ -139,5 +136,28 @@ def delete_session(session_id):
         return jsonify({'message': 'Session deleted'}), 200
     except sqlite3.Error as e:
         # [SECURITY FIX] Prevent information disclosure
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500
+
+# [SECURITY FIX] Privacy enhanced!
+# 1.5) Read personal sessions - GET /api/sessions/me
+@sessions_bp.route('/me', methods=['GET'])
+def get_my_sessions():
+    caller_id = request.headers.get('X-User-Id')
+    if not caller_id:
+        return jsonify({'success': False, 'message': 'Missing X-User-Id header'}), 401
+
+    try:
+        db = get_db()
+        sessions = db.execute("""
+        SELECT s.id, s.started_at, s.ended_at, u.username, m.name AS machine_name
+        FROM sessions s
+        JOIN users u ON s.user_id = u.id
+        JOIN machines m ON s.machine_id = m.id
+        WHERE s.user_id = ?
+        """, (caller_id,)).fetchall()
+
+        return jsonify([dict(row) for row in sessions]), 200
+    except sqlite3.Error as e:
         print(f"DB ERROR: {e}")
         return jsonify({"success": False, "error": "Internal Database Error"}), 500

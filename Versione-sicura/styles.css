@@ -796,3 +796,8 @@ footer a:hover { text-decoration: underline; }
     background-color: transparent !important;
     text-decoration: none;
 }
+
+.no-scroll { overflow:hidden; }
+.w-100 {
+    width: 100%;
+}

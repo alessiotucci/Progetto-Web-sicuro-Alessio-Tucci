@@ -3,7 +3,21 @@
 // =============================================================================
 // DASHBOARD
 // =============================================================================
-
+export function getAuthHeaders()
+{
+    try
+	{
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || !user.id) return {};
+        return {
+            'X-User-Id': user.id.toString()
+        };
+    }
+	catch
+	{
+        return {};
+    }
+}
 export async function loadDashboardView()
 {
     try {
@@ -11,10 +25,20 @@ export async function loadDashboardView()
         // the session cookie is sent and the server can enforce authentication.
         // Without this, the endpoints would be effectively public to any script
         // that can reach the server.
-        const [machinesRes, sessionsRes] = await Promise.all([
-            fetch('/api/machines/', { credentials: 'same-origin' }),
-            fetch('/api/sessions/', { credentials: 'same-origin' })
-        ]);
+
+		// [OTHER FIX]
+		const headers = getAuthHeaders();
+
+		const [machinesRes, sessionsRes] = await Promise.all([
+			fetch('/api/machines/', {
+				credentials: 'same-origin',
+				headers
+			}),
+			fetch('/api/sessions/', {
+				credentials: 'same-origin',
+				headers
+			})
+		]);
 
         // [SECURITY FIX] Check HTTP status before parsing. A 401/403 from the
         // server would otherwise be silently swallowed and the dashboard would

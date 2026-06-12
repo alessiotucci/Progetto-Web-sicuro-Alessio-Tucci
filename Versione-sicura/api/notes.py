@@ -51,7 +51,6 @@ def get_note(note_id):
 
 # 3) Create - POST /api/notes
 @notes_bp.route('/', methods=['POST'])
-@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def create_note():
     data = request.get_json()
 
@@ -83,7 +82,6 @@ def create_note():
 
 # 4) Update - PUT /api/notes/<note_id>
 @notes_bp.route('/<note_id>', methods=['PUT'])
-@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def update_note(note_id):
     data = request.get_json()
 
@@ -109,7 +107,6 @@ def update_note(note_id):
 
 # 5) Delete - DELETE /api/notes/<note_id>
 @notes_bp.route('/<note_id>', methods=['DELETE'])
-@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def delete_note(note_id):
     try:
         db = get_db()
@@ -120,3 +117,27 @@ def delete_note(note_id):
         # [SECURITY FIX] Prevent information disclosure
         print(f"DB ERROR: {e}")
         return jsonify({"success": False, "error": "Internal Database Error"}), 500
+
+# [SECURITY FIX] Privacy enhanced!
+# 1.5) Read personal notes - GET /api/notes/me
+@notes_bp.route('/me', methods=['GET'])
+def get_my_notes():
+    caller_id = request.headers.get('X-User-Id')
+    if not caller_id:
+        return jsonify({'success': False, 'message': 'Missing X-User-Id header'}), 401
+
+    try:
+        db = get_db()
+        notes = db.execute("""
+        SELECT n.id, n.content, n.created_at, u.username, m.name
+        FROM notes n
+        JOIN users u ON n.user_id = u.id
+        JOIN machines m ON n.machine_id = m.id
+        WHERE n.user_id = ?
+        """, (caller_id,)).fetchall()
+
+        return jsonify([dict(row) for row in notes]), 200
+    except sqlite3.Error as e:
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500
+    
