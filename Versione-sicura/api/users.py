@@ -1,13 +1,16 @@
 from flask import Blueprint, request, jsonify
 from api.db import get_db
+from werkzeug.security import generate_password_hash
+from api.decorators import admin_required
+import sqlite3
 
 users_bp = Blueprint('users', __name__)
 
-# 1) Read all - GET /api/users
+# 1) Read all - GET /api/users (Admin Only)
 @users_bp.route('/', methods=['GET'])
+@admin_required
 def get_users():
     db = get_db()
-    #TODO: no auth service, no check admin role, not cleaning input
     users = db.execute("""
     SELECT username, role, id
     FROM users
@@ -22,8 +25,8 @@ def get_user(user_id):
     user = db.execute("""
     SELECT u.username, u.role
     FROM users u
-    WHERE u.id = '%s'
-    """ % user_id).fetchone()
+    WHERE u.id = ?
+    """, (user_id,)).fetchone()
 
     if user is None:
         return jsonify({'error': 'User not found'}), 404
@@ -33,55 +36,70 @@ def get_user(user_id):
 # 3) Create - POST /api/users
 @users_bp.route('/', methods=['POST'])
 def create_user():
-    db = get_db()
     data = request.get_json()
+    if not data or 'username' not in data or 'password' not in data:
+        return jsonify({"success": False, "message": "Campi mancanti"}), 400
 
-    #TODO: no auth service, no check admin role, no cleaning input
     username = data['username']
     password = data['password']
-    role = 'user' #role = data['role']
 
-    cursor = db.execute(
-            "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-            (username, password, role)
-            )
-    user_id = cursor.lastrowid
-    db.commit()
+    hashed_password = generate_password_hash(password)
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        query = "INSERT INTO users (username, password, role) VALUES (?, ?, 'user')"
+        cursor.execute(query, (username, hashed_password))
+        user_id = cursor.lastrowid
+        conn.commit()
+    except sqlite3.IntegrityError:
+        return jsonify({"success": False, "error": "Username already exists"}), 409
+    except sqlite3.Error as e:
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500
 
-    return jsonify({'message': 'User created', 'id': user_id}), 201
+    return jsonify({
+        "success": True,
+        "user": {
+            "id": user_id,
+            "username": username,
+            "role": "user"
+        }
+    }), 201
 
-# 4) Update - PUT /api/users/<user_id>
+# 4) Update - PUT /api/users/<user_id> (Admin Only)
 @users_bp.route('/<user_id>', methods=['PUT'])
+@admin_required
 def update_users(user_id):
     db = get_db()
     data = request.get_json()
 
-    #TODO: no auth service, no check admin role, no cleaning input
-#    username = data['username']
-#    password = data['password']
-#
-#    db.execute(
-#            "UPDATE users SET username = ?, password = ? WHERE id = ?",
-#            (username, password, user_id)
-#            )
+    if not data or 'role' not in data:
+        return jsonify({"success": False, "message": "Missing role field"}), 400
 
     role = data['role']
-    db.execute(
+    
+    try:
+        db.execute(
             "UPDATE users SET role = ? WHERE id = ?",
             (role, user_id)
-            )
-
-    db.commit()
+        )
+        db.commit()
+    except sqlite3.Error as e:
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500
 
     return jsonify({'message': 'User updated'}), 200
 
-# 5) Delete - DELETE /api/users/<user_id>
+# 5) Delete - DELETE /api/users/<user_id> (Admin Only)
 @users_bp.route('/<user_id>', methods=['DELETE'])
+@admin_required
 def delete_user(user_id):
     db = get_db()
-
-    #TODO: no auth service, no check admin, no cleaning input
-    db.execute("DELETE FROM users WHERE id = ?", (user_id,))
-    db.commit()
-
+    try:
+        db.execute("DELETE FROM users WHERE id = ?", (user_id,))
+        db.commit()
+    except sqlite3.Error as e:
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500
+        
     return jsonify({'message': 'User deleted!'}), 200

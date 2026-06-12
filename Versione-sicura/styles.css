@@ -1,19 +1,19 @@
 /* Custom CSS for the safe version */
 :root {
     /* Brand colors */
-    --color-brand:         #3B5BDB;   /* indigo-tinted blue */
+    --color-brand:         #06175a;   /* indigo-tinted blue */
     --color-brand-light:   #EEF2FF;   /* softer indigo tint */
-    --color-brand-dark:    #2F4AC0;   /* deeper indigo hover */
+    --color-brand-dark:    #2e396a;   /* deeper indigo hover */
 
-    --color-danger:        #E03131;
+    --color-danger:        #eb7600;
     --color-danger-light:  #FFF5F5;
-    --color-success:       #2F9E44;
+    --color-success:       #05e32e;
     --color-success-light: #EBFBEE;
 
     --color-text:          #111827;
     --color-text-muted:    #6B7280;
     --color-border:        #E5E7EB;
-    --color-bg:            #F9FAFB;
+    --color-bg:            #bdbdbd;
     --color-surface:       #FFFFFF;
     --space-xs:  4px;
     --space-sm:  8px;

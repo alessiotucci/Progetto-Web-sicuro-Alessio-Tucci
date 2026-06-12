@@ -1,89 +1,122 @@
 from flask import Blueprint, request, jsonify
 from api.db import get_db
+from api.decorators import admin_required
+import sqlite3
+import html # [SECURITY FIX] Imported for XSS sanitization
 
 notes_bp = Blueprint('notes', __name__)
 
 # 1) Read all - GET /api/notes
 @notes_bp.route('/', methods=['GET'])
+@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def get_notes():
-    db = get_db()
-    #TODO: no auth service, no check admin role, not cleaning input
-    notes = db.execute("""
-    SELECT n.id, n.content, n.created_at, u.username, m.name
-    FROM notes n
-    JOIN users u ON n.user_id = u.id
-    JOIN machines m ON n.machine_id = m.id
-    """).fetchall()
+    try:
+        db = get_db()
+        notes = db.execute("""
+        SELECT n.id, n.content, n.created_at, u.username, m.name
+        FROM notes n
+        JOIN users u ON n.user_id = u.id
+        JOIN machines m ON n.machine_id = m.id
+        """).fetchall()
 
-    return jsonify([dict(row) for row in notes]), 200
+        return jsonify([dict(row) for row in notes]), 200
+    except sqlite3.Error as e:
+        # [SECURITY FIX] Prevent information disclosure by catching DB errors
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500
 
 # 2) Read one - GET /api/notes/<note_id>
 @notes_bp.route('/<note_id>', methods=['GET'])
+@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def get_note(note_id):
-    db = get_db()
-    #TODO: no auth service, no check admin role, not cleaning input
-    note = db.execute("""
-    SELECT n.id, n.content, n.created_at, u.username, m.name
-    FROM notes n
-    JOIN users u ON n.user_id = u.id
-    JOIN machines m ON n.machine_id = m.id
-    WHERE n.id = '%s'
-    """ % note_id).fetchone()
+    try:
+        db = get_db()
+        # [SECURITY FIX] Replaced f-string/interpolation with parameterized query to prevent SQL Injection
+        note = db.execute("""
+        SELECT n.id, n.content, n.created_at, u.username, m.name
+        FROM notes n
+        JOIN users u ON n.user_id = u.id
+        JOIN machines m ON n.machine_id = m.id
+        WHERE n.id = ?
+        """, (note_id,)).fetchone()
 
-    if note is None:
-        return jsonify({'error': 'Note not found'}), 404
+        if note is None:
+            return jsonify({'error': 'Note not found'}), 404
 
-    return jsonify(dict(note)), 200
+        return jsonify(dict(note)), 200
+    except sqlite3.Error as e:
+        # [SECURITY FIX] Prevent information disclosure
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500
 
 # 3) Create - POST /api/notes
 @notes_bp.route('/', methods=['POST'])
+@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def create_note():
-    db = get_db()
     data = request.get_json()
+
+    # [SECURITY FIX] Added input validation to prevent malicious or malformed data
+    if not data or not data.get('user_id') or not data.get('machine_id') or not data.get('content'):
+        return jsonify({'error': 'Missing required fields'}), 400
 
     user_id = data.get('user_id')
     machine_id = data.get('machine_id')
-    content = data.get('content')
-
-    if not user_id or not machine_id or not content:
-        return jsonify({'error': 'Missing required fields'}), 400
-
-    cursor = db.execute(
-        "INSERT INTO notes (user_id, machine_id, content) VALUES (?, ?, ?)",
-        (user_id, machine_id, content)
-    )
-    db.commit()
     
-    note_id = cursor.lastrowid
+    # [SECURITY FIX] XSS Prevention: Sanitize the input to neutralize HTML/JavaScript execution 
+    # before storing it in the database (Stored XSS mitigation).
+    content = html.escape(data.get('content'))
 
-    return jsonify({'message': 'Note created', 'id': note_id}), 201
+    try:
+        db = get_db()
+        cursor = db.execute(
+            "INSERT INTO notes (user_id, machine_id, content) VALUES (?, ?, ?)",
+            (user_id, machine_id, content)
+        )
+        db.commit()
+        
+        note_id = cursor.lastrowid
+        return jsonify({'message': 'Note created', 'id': note_id}), 201
+    except sqlite3.Error as e:
+        # [SECURITY FIX] Prevent information disclosure
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500
 
 # 4) Update - PUT /api/notes/<note_id>
 @notes_bp.route('/<note_id>', methods=['PUT'])
+@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def update_note(note_id):
-    db = get_db()
     data = request.get_json()
 
-    #TODO: no auth service, no check admin role, no cleaning input
-    content = data.get('content')
-    # created at ???
+    # [SECURITY FIX] Added input validation
+    if not data or not data.get('content'):
+        return jsonify({'error': 'Missing required fields'}), 400
 
-    db.execute(
+    # [SECURITY FIX] XSS Prevention: Sanitize the input to prevent Stored XSS attacks
+    content = html.escape(data.get('content'))
+
+    try:
+        db = get_db()
+        db.execute(
             "UPDATE notes SET content = ? WHERE id = ?",
             (content, note_id)
-            )
-    db.commit()
-
-    return jsonify({'message': 'Note updated'}), 200
+        )
+        db.commit()
+        return jsonify({'message': 'Note updated'}), 200
+    except sqlite3.Error as e:
+        # [SECURITY FIX] Prevent information disclosure
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500
 
 # 5) Delete - DELETE /api/notes/<note_id>
 @notes_bp.route('/<note_id>', methods=['DELETE'])
+@admin_required # [SECURITY FIX] Auth and admin role check enforced
 def delete_note(note_id):
-    db = get_db()
-
-    #TODO: no auth service, no check admin role, no cleaning input
-    db.execute("DELETE FROM notes WHERE id = ?", (note_id,))
-    db.commit()
-
-    return jsonify({'message': 'Note deleted'}), 200
-
+    try:
+        db = get_db()
+        db.execute("DELETE FROM notes WHERE id = ?", (note_id,))
+        db.commit()
+        return jsonify({'message': 'Note deleted'}), 200
+    except sqlite3.Error as e:
+        # [SECURITY FIX] Prevent information disclosure
+        print(f"DB ERROR: {e}")
+        return jsonify({"success": False, "error": "Internal Database Error"}), 500

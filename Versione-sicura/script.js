@@ -201,7 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Signup handler
     registerFormHandler('form-signup', '/api/users', (result) => {
-        if (result.message === 'User created' || result.id) {
+        if (result.success)
+		{
             // [SECURITY FIX] Do not store unverified user data from the signup
             // response — force a proper login instead so the server issues a
             // fresh authenticated session.
@@ -239,37 +240,7 @@ function _injectAdminLinkIfAdmin()
         if (existing) existing.remove();
     }
 }
-
 function goofy_animation() {
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .laundry-toast {
-            position: fixed;
-            bottom: var(--space-xl);
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background-color: var(--color-success-light);
-            color: var(--color-success);
-            border: 2px solid var(--color-success);
-            border-radius: var(--radius-lg);
-            padding: var(--space-md) var(--space-lg);
-            font-size: 1.1rem;
-            font-weight: 700;
-            box-shadow: 0 10px 25px rgba(22, 163, 74, 0.2);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            opacity: 0;
-            animation: laundrySlideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        @keyframes laundrySlideUp {
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-    `;
-    document.head.appendChild(style);
-
     const toast = document.createElement('div');
     toast.className = 'laundry-toast';
     toast.innerHTML = '<span style="font-size: 1.5rem;">🫧</span> Account creato!';
@@ -278,6 +249,6 @@ function goofy_animation() {
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(-50%) translateY(20px)';
-        setTimeout(() => { toast.remove(); style.remove(); }, 300);
+        setTimeout(() => toast.remove(), 300);
     }, 2500);
 }
